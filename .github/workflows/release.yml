@@ -1,9 +1,13 @@
+# 暂时停用该yml
+
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'  # 触发条件：打 Tag，比如 v1.0.0
+  workflow_dispatch: 
+    # 手动触发工作流
+  # push:
+  #   tags:
+  #     - 'v*'  # 触发条件：打 Tag，比如 v1.0.0
 
 permissions:
   contents: write
@@ -22,7 +26,7 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 23
           cache: 'pnpm'
           cache-dependency-path: 'web/pnpm-lock.yaml'
       - name: Install and build

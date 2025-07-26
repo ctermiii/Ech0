@@ -64,3 +64,10 @@ const (
 	GET_CONNECT_INFO_SUCCESS   = "获取 Connect 信息成功"
 	GET_CONNECTED_LIST_SUCCESS = "获取连接列表成功"
 )
+
+// Backup 成功相关常量
+const (
+	BACKUP_SUCCESS        = "备份成功"
+	EXPORT_BACKUP_SUCCESS = "导出备份成功"
+	IMPORT_BACKUP_SUCCESS = "导入备份成功"
+)

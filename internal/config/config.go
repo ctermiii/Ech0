@@ -59,6 +59,11 @@ type AppConfig struct {
 		Provider      string `yaml:"provider"`   // 评论提供者
 		CommentAPI    string `yaml:"commentapi"` // 评论 API 地址
 	} `yaml:"comment"`
+	SSH struct {
+		Port string `yaml:"port"` // SSH 端口
+		Host string `yaml:"host"` // SSH 主机地址
+		Key  string `yaml:"key"`  // SSH 私钥路径
+	} `yaml:"ssh"`
 }
 
 //go:embed config.yaml

@@ -3,6 +3,9 @@ package handler
 import "github.com/gin-gonic/gin"
 
 type CommonHandlerInterface interface {
+	// ShowImage 显示图片
+	// ShowImage() gin.HandlerFunc
+
 	// UploadImage 上传图片
 	UploadImage() gin.HandlerFunc
 

@@ -5,17 +5,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lin-snow/ech0/internal/cache"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/echo"
 	"gorm.io/gorm"
 )
 
 type EchoRepository struct {
-	db *gorm.DB
+	db    *gorm.DB
+	cache cache.ICache[string, commonModel.PageQueryResult[[]model.Echo]]
 }
 
-func NewEchoRepository(db *gorm.DB) EchoRepositoryInterface {
-	return &EchoRepository{db: db}
+func NewEchoRepository(db *gorm.DB, cache cache.ICache[string, commonModel.PageQueryResult[[]model.Echo]]) EchoRepositoryInterface {
+	return &EchoRepository{db: db, cache: cache}
 }
 
 func (echoRepository *EchoRepository) CreateEcho(echo *model.Echo) error {
@@ -25,11 +27,22 @@ func (echoRepository *EchoRepository) CreateEcho(echo *model.Echo) error {
 	if result.Error != nil {
 		return result.Error
 	}
+
+	ClearEchoPageCache(echoRepository.cache)
+
 	return nil
 }
 
 // GetEchosByPage 获取分页的 Echo 列表
 func (echoRepository *EchoRepository) GetEchosByPage(page, pageSize int, search string, showPrivate bool) ([]model.Echo, int64) {
+	// 查找缓存
+	cacheKey := GetEchoPageCacheKey(page, pageSize, search, showPrivate)
+	if cachedResult, err := echoRepository.cache.Get(cacheKey); err == nil {
+		return cachedResult.Items, cachedResult.Total
+	}
+
+	// 如果缓存未命中，进行数据库查询
+
 	// 计算偏移量
 	offset := (page - 1) * pageSize
 
@@ -57,6 +70,13 @@ func (echoRepository *EchoRepository) GetEchosByPage(page, pageSize int, search 
 		Offset(offset).
 		Order("created_at DESC").
 		Find(&echos)
+
+	// 保存到缓存
+	echoKeyList = append(echoKeyList, cacheKey) // 记录缓存键
+	echoRepository.cache.Set(cacheKey, commonModel.PageQueryResult[[]model.Echo]{
+		Items: echos,
+		Total: total,
+	}, 1)
 
 	// 返回结果
 	return echos, total
@@ -89,6 +109,10 @@ func (echoRepository *EchoRepository) DeleteEchoById(id uint) error {
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound // 如果没有找到记录
 	}
+
+	// 清除相关缓存
+	ClearEchoPageCache(echoRepository.cache)
+
 	return nil
 }
 
@@ -123,6 +147,9 @@ func (echoRepository *EchoRepository) GetTodayEchos(showPrivate bool) []model.Ec
 
 // UpdateEcho 更新 Echo
 func (echoRepository *EchoRepository) UpdateEcho(echo *model.Echo) error {
+	// 清空缓存
+	ClearEchoPageCache(echoRepository.cache)
+
 	// 开启事务确保数据一致性
 	tx := echoRepository.db.Begin()
 	if tx.Error != nil {
@@ -194,6 +221,9 @@ func (echoRepository *EchoRepository) LikeEcho(id uint) error {
 		UpdateColumn("fav_count", gorm.Expr("fav_count + ?", 1)).Error; err != nil {
 		return err
 	}
+
+	// 清除相关缓存
+	ClearEchoPageCache(echoRepository.cache)
 
 	return nil
 }

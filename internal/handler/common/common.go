@@ -20,6 +20,21 @@ func NewCommonHandler(commonService service.CommonServiceInterface) *CommonHandl
 	}
 }
 
+// ShowImage 显示图片
+// func (commonHandler *CommonHandler) ShowImage() gin.HandlerFunc {
+// 	return func (ctx *gin.Context) {
+// 		ctx.Header("Access-Control-Allow-Origin", "*")
+
+// 		// 安全校验：防止路径遍历攻击
+// 		filepath := ctx.Param("filepath")
+// 		if filepath == "/" || filepath == ".." {
+// 			ctx.AbortWithStatusJSON(http.StatusBadRequest, commonModel.INVALID_FILE_PATH)
+// 		}
+
+// 		ctx.File("./data/images/" + ctx.Param(filepath))
+// 	}
+// }
+
 // UploadImage 上传图片
 func (commonHandler *CommonHandler) UploadImage() gin.HandlerFunc {
 	return res.Execute(func(ctx *gin.Context) res.Response {

@@ -21,4 +21,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    // 当使用embed时则调整构建输出到后端的template/dist目录
+    outDir: '../template/dist',
+    emptyOutDir: true,
+  }
 })

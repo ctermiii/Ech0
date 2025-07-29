@@ -1,9 +1,12 @@
 import { getApiUrl } from '@/service/request/shared'
+import { ImageSource } from '@/enums/enums'
 // 获取图片链接
 export const getImageUrl = (image: App.Api.Ech0.Image) => {
-  if (image.image_source === 'local') {
+  if (image.image_source === ImageSource.LOCAL) {
     return getApiUrl() + String(image.image_url)
-  } else if (image.image_source === 'url') {
+  } else if (image.image_source === ImageSource.URL) {
+    return String(image.image_url)
+  } else if (image.image_source === ImageSource.S3) {
     return String(image.image_url)
   } else {
     // 未知的图片来源，按照本地图片处理
@@ -13,9 +16,11 @@ export const getImageUrl = (image: App.Api.Ech0.Image) => {
 
 // 获取待添加图片链接
 export const getImageToAddUrl = (image: App.Api.Ech0.ImageToAdd) => {
-  if (image.image_source === 'local') {
+  if (image.image_source === ImageSource.LOCAL) {
     return getApiUrl() + String(image.image_url)
-  } else if (image.image_source === 'url') {
+  } else if (image.image_source === ImageSource.URL) {
+    return String(image.image_url)
+  } else if (image.image_source === ImageSource.S3) {
     return String(image.image_url)
   } else {
     // 未知的图片来源，按照本地图片处理

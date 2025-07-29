@@ -106,3 +106,26 @@ export const requestWithDirectUrlAndData = async <T>(
     return res
   })
 }
+
+export const downloadFile = async (requestOptions: RequestOptions): Promise<Blob> => {
+  // 检查是否使用正向代理
+  if (import.meta.env.VITE_PROXY === 'YES') {
+    const proxyUrl = import.meta.env.VITE_PROXY_URL
+    if (!proxyUrl) {
+      throw new Error('Proxy URL is not defined')
+    }
+    requestOptions.url = `${proxyUrl}${requestOptions.url}`
+  }
+
+  return ofetchInstance<Blob>(requestOptions.url, {
+    method: requestOptions.method,
+    body: requestOptions.data,
+  }).then((res) => {
+    if (res instanceof Blob) {
+      return res
+    } else {
+      theToast.error('下载失败')
+      throw new Error('下载失败')
+    }
+  })
+}

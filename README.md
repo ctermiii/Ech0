@@ -11,6 +11,14 @@
   # Ech0
 </div>
 
+<div align="center">
+
+[![GitHub release](https://img.shields.io/github/v/release/lin-snow/Ech0)](https://github.com/lin-snow/Ech0/releases) ![License](https://img.shields.io/github/license/lin-snow/Ech0) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lin-snow/Ech0)
+
+</div>
+
+
+
 > 开源、自托管、专注思想流动的轻量级发布平台
 
 Ech0 是一款专为轻量级分享而设计的开源自托管平台，支持快速发布与分享你的想法、文字与链接。简单直观的操作界面，轻松管理你的内容，让分享变得更加自由，确保数据完全掌控，随时随地与世界连接。
@@ -21,10 +29,14 @@ Ech0 是一款专为轻量级分享而设计的开源自托管平台，支持快
 
 ## 核心优势
 
-☁️ **原子级轻量**：内存占用不到**15MB**，镜像大小不到**35MB**,单SQLite文件存储架构  
+☁️ **原子级轻量**：内存占用不到**15MB**，镜像大小不到**40MB**,单SQLite文件存储架构  
 🚀 **极速部署**：无需配置，从安装到使用只需1条命令  
+🧰 **命令行利器**：内置高可用 CLI 工具，支持一键备份、恢复、导出  
+📟 极致 TUI 支持：面向终端用户打造的友好交互界面，轻松进行对Ech0进行管理  
 ✍️ **零干扰写作**：纯净的在线Markdown编辑器，**支持丰富的Markdown插件与预览**  
 📦 **数据主权**：所有内容存储于本地SQLite文件，支持RSS订阅  
+🔐 **安全备份机制**：支持Web、TUI、CLI三种模式下一键导出、备份完整数据  
+♻️ **无感恢复支持**：通过TUI或 CLI 即可恢复任意备份，保障数据安全无忧  
 🎉 **永久免费**：AGPL-3.0协议开源，无追踪/无订阅/无服务依赖  
 🌍 **跨端适配**：完美兼容桌面/移动浏览器，支持手机、iPad、PC三端响应式布局  
 👾 **PWA适配**：支持作为Web应用安装  
@@ -35,6 +47,13 @@ Ech0 是一款专为轻量级分享而设计的开源自托管平台，支持快
 🃏 **丰富的快捷卡片**：支持网站链接、GitHub项目等多种富媒体内容一键分享，让信息展示更加直观生动  
 ⚙️ **高级自定义功能**：为高级用户提供便捷自定义样式与脚本，分享更具表现力  
 💬 **评论系统**：支持快捷接入Twikoo评论服务，轻量、快捷、无侵入，为你的内容带来即时互动与反馈  
+💻 **跨平台兼容**：原生支持 Windows、Linux 以及树莓派等 ARM 架构设备，确保多样化部署场景下稳定运行  
+🔗 **官方 Ech0 Hub 内容广场接入**：支持手动提交接入官方 Ech0 Hub 内容生态，轻松发现、订阅和共享优质内容  
+🌐 **自部署 Ech0 Hub 支持**：允许用户将自身 Connect 列表作为自部署 Ech0 Hub 的内容来源，实现内容网络的高度自治与扩展  
+📦 **二进制自包含**：集成完整前端资源，单一二进制文件即可启动使用，无需额外安装依赖或配置，极大简化部署流程  
+🔗 **丰富的 API 支持**: 提供开放 API，方便与其他系统集成，实现更灵活的应用场景。  
+🃏 **内容展示支持**：支持类 X（Twitter）风格卡片展示，同时支持点赞等社交互动  
+👤 多用户与权限管理：支持多用户账户体系，提供灵活的权限控制，保障内容和功能访问的安全性与私密性  
 
 ---
 
@@ -51,13 +70,15 @@ curl -fsSL "http://echo.soopy.cn/install.sh" -o install_ech0.sh && bash install_
 docker run -d \
   --name ech0 \
   -p 6277:6277 \
+  -p 6278:6278 \
   -v /opt/ech0/data:/app/data \
-  -e JWT_SECRET="Hello Echos!" \
+  -v /opt/ech0/backup:/app/backup \
+  -e JWT_SECRET="Hello Echos" \
   sn0wl1n/ech0:latest
 ```
 
 > 💡 部署完成后访问 ip:6277 即可使用  
-> 🚷 建议把`-e JWT_SECRET="Hello Echos!"`里的`Hello Echos!`改成别的内容以提高安全性  
+> 🚷 建议把`-e JWT_SECRET="Hello Echos"`里的`Hello Echos`改成别的内容以提高安全性  
 > 📍 首次使用注册的账号会被设置为管理员（目前仅管理员支持发布内容）  
 > 🎈 数据存储在/opt/ech0/data下
 
@@ -91,7 +112,9 @@ docker pull sn0wl1n/ech0:latest
 docker run -d \
   --name ech0 \
   -p 6277:6277 \
+  -p 6278:6278 \
   -v /opt/ech0/data:/app/data \
+  -v /opt/ech0/backup:/app/backup \
   -e JWT_SECRET="Hello Echos" \
   sn0wl1n/ech0:latest
 ```
@@ -112,6 +135,25 @@ docker image prune -f
 
 ---
 
+# 如何进入TUI模式
+
+![TUI 模式](./docs/imgs/tui.png)
+
+1. 直接运行对应的二进制文件
+> 以Windows版为例子： 直接双击启动Windows版Ech0.exe
+
+---
+
+# 如何进入SSH模式
+
+1. 在终端中输入部署的实例地址:6278
+例如：
+```shell
+ssh -p 6278 ssh.vaaat.com
+```
+
+---
+
 # 🦖 未来目标
 
 - [x] 使用裸Vue3重写整个前端
@@ -119,9 +161,11 @@ docker image prune -f
 - [x] 重构后端，使其更加优雅高效
 - [x] 解决跨平台问题
 - [x] 使用Figma重新设计Logo
-- [ ] 优化各项画面细节 && 增加更多实用功能
-- [ ] 性能优化 && 美化界面
-- [ ] 许愿有大佬帮忙写个文档和Ech0-Hub🤪
+- [x] 优化各项画面细节 && 增加更多实用功能
+- [x] 性能优化 && 美化界面
+- [ ] 许愿有大佬帮忙补充文档🤪
+- [ ] 许愿有大佬帮忙写Swagger注释，当前仍有大部分接口缺少Swagger注释
+- [ ] 许愿有大佬帮忙写测试
 
 ---
 
@@ -179,7 +223,7 @@ docker image prune -f
 
 # 🛠️ 开发
 ## **后端要求:**  
-📌 **Go 1.24.3+**
+📌 **Go 1.24.5+**
 
 📌 **C 编译器**  
 使用 `go-sqlite3` 等需要 CGO 的库时，需安装：  
@@ -197,6 +241,11 @@ docker image prune -f
 安装[Golangci-Lint](https://golangci-lint.run/)用于lint和fmt:  
 - 在项目根目录下执行`golangci-lint run`进行lint  
 - 在项目根目录下执行`golangci-lint fmt`进行格式化  
+
+📌 **Swagger**  
+安装[Swagger](https://github.com/swaggo/gin-swagger)用于生成和使用符合OpenAPI规范的接口文档
+- 在项目根目录下执行`swag init -g internal/server/server.go -o internal/swagger`后生成或更新swagger文档  
+- 打开浏览器访问`http://localhost:6277/swagger/index.html`查看和使用swagger文档  
 
 ## **前端要求:**  
 📌  **NodeJS v23.11.1, PNPM v10.13.1**

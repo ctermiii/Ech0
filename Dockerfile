@@ -10,12 +10,21 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 
 # 创建数据目录
-RUN mkdir -p /app/data && \
-    mkdir -p /app/template
+RUN mkdir -p /app/data
+
+# 创建备份目录
+RUN mkdir -p /app/backup
+
+# 创建数据目录(embed版无需手动创建template)
+# RUN mkdir -p /app/data && \
+#     mkdir -p /app/template
+
+# 将所有平台的 ech0 二进制复制进镜像(embed版无需复制前端资源)
+COPY /backend-artifacts/* /tmp/
 
 # 将所有平台的 ech0 二进制和前端资源复制进镜像
-COPY /backend-artifacts/* /tmp/
-COPY /frontend-asset/frontend.tar.gz /tmp/
+# COPY /backend-artifacts/* /tmp/
+# COPY /frontend-asset/frontend.tar.gz /tmp/
 
 # 解压对应平台的 ech0 二进制
 RUN mkdir -p /app/template && \
@@ -29,7 +38,7 @@ RUN mkdir -p /app/template && \
        echo "Unsupported platform: $TARGETOS/$TARGETARCH$TARGETVARIANT" && exit 1; \
     fi && \
     # 解压前端静态资源到 /app/template
-    tar -xzf /tmp/frontend.tar.gz -C /app/template && \
+   #  tar -xzf /tmp/frontend.tar.gz -C /app/template && \
     # 清理临时文件
     rm -rf /tmp/*
 
@@ -48,5 +57,8 @@ RUN ls -lh /app
 RUN chmod +x /app/ech0
 
 EXPOSE 6277
+EXPOSE 6278
 
-CMD ["/app/ech0"]
+ENTRYPOINT ["/app/ech0"]
+
+CMD ["serve"]

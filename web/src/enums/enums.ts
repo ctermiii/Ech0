@@ -1,3 +1,12 @@
+// 控制面板的状态
+export enum ShowWhichEnum {
+  Status = 'status',
+  Setting = 'setting',
+  UserCenter = 'usercenter',
+  Other = 'other',
+}
+
+// 编辑器的状态
 export enum Mode {
   ECH0 = 0, // 默认编辑状态
   Panel = 1, // 显示面板状态
@@ -7,6 +16,7 @@ export enum Mode {
   Image = 5, // 图片上传状态
 }
 
+// 扩展类型
 export enum ExtensionType {
   MUSIC = 'MUSIC',
   VIDEO = 'VIDEO',
@@ -14,6 +24,7 @@ export enum ExtensionType {
   WEBSITE = 'WEBSITE',
 }
 
+// 图片来源
 export enum ImageSource {
   LOCAL = 'local',
   URL = 'url',
@@ -21,6 +32,7 @@ export enum ImageSource {
   R2 = 'r2',
 }
 
+// 评论服务提供者
 export enum CommentProvider {
   TWIKOO = 'twikoo',
   ARTALK = 'artalk',

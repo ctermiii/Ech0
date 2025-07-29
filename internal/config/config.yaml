@@ -43,3 +43,8 @@ comment:
   enablecomment: false
   provider: "twikoo"
   commentapi: ""
+
+ssh:
+  port: "6278"
+  host: "0.0.0.0"
+  key: "data/ssh/id_ed25519"

@@ -1,9 +1,22 @@
 package model
 
-// UserInfoDto 定义用户信息数据传输对象
+// UserInfoDto 用户信息数据传输对象
+//
+// swagger:model UserInfoDto
 type UserInfoDto struct {
+	// 用户名
+	// example: linsnow
 	Username string `json:"username"`
+
+	// 密码
+	// example: 123456
 	Password string `json:"password"`
-	IsAdmin  bool   `json:"is_admin"`
-	Avatar   string `json:"avatar"`
+
+	// 是否为管理员
+	// example: false
+	IsAdmin bool `json:"is_admin"`
+
+	// 头像地址
+	// example: https://example.com/avatar.png
+	Avatar string `json:"avatar"`
 }

@@ -25,7 +25,7 @@
     "pinia": "^3.0.3",
     "screenfull": "^6.0.2",
     "vditor": "^3.11.1",
-    "vue": "^3.5.17",
+    "vue": "^3.5.18",
     "vue-router": "^4.5.1",
     "vue-sonner": "^2.0.2"
   },
@@ -39,7 +39,7 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "~10.0.1",
-    "jiti": "^2.4.2",
+    "jiti": "^2.5.1",
     "npm-run-all2": "^7.0.2",
     "prettier": "3.5.3",
     "tsx": "^4.20.3",

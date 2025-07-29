@@ -5,7 +5,8 @@ services:
     container_name: ech0
     ports:
       - "6277:6277"
+      - "6278:6278"
     volumes:
       - ./ech0/data:/app/data
     environment:
-      - JWT_SECRET="Hello Echos!"
+      - JWT_SECRET="Hello Echos"

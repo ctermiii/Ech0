@@ -1,18 +1,29 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	errorUtil "github.com/lin-snow/ech0/internal/util/err"
-	"net/http"
 )
 
 // Response 代表 handler 层的执行结果封装
+//
+// swagger:model Response
 type Response struct {
-	Code int
-	Data any
-	Msg  string
-	Err  error
+	// Code 状态码，非0时表示自定义HTTP业务状态码
+	Code int `json:"code"`
+
+	// Data 响应数据，具体内容因接口而异
+	Data any `json:"data,omitempty"`
+
+	// Msg 返回信息，通常是状态描述
+	Msg string `json:"msg"`
+
+	// Err 错误信息，序列化时忽略（仅供内部日志使用）
+	// swagger:ignore
+	Err error `json:"-"`
 }
 
 // Execute 包装器，自动根据 Response 返回统一格式的 HTTP 响应 (仅处理返回类型为JSON的handler)

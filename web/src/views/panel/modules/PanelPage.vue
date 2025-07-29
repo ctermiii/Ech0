@@ -18,12 +18,12 @@
         </div>
         <!-- 操作按钮 -->
         <div class="flex flex-row items-center gap-2">
-          <!-- 状态 / 设置 / 个人中心 -->
+          <!-- 状态 / 设置 / 个人中心 / 其它 -->
           <BaseButton
-            :icon="[Setting, User, Status][ShowingIndex]"
+            :icon="[Setting, User, TheOthersIcon, Status][ShowingIndex]"
             @click="changeShow"
             class="text-gray-600 rounded-md w-8 h-8 sm:w-9 sm:h-9"
-            title="状态 / 设置 / 个人中心"
+            title="状态 / 设置 / 个人中心 / 其它"
           />
 
           <!-- 退出登录 -->
@@ -49,34 +49,39 @@
       <TheSetting v-if="Showing === ShowWhichEnum.Setting" />
       <!-- TheUserCenter -->
       <TheUser v-if="Showing === ShowWhichEnum.UserCenter" />
+      <!-- TheOthers -->
+      <TheOthers v-if="Showing === ShowWhichEnum.Other" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import TheStatus from './TheStatus.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import Arrow from '@/components/icons/arrow.vue'
 import User from '@/components/icons/user.vue'
 import Auth from '@/components/icons/auth.vue'
 import Status from '@/components/icons/status.vue'
+import TheOthersIcon from '@/components/icons/theothers.vue'
 import Setting from '@/components/icons/setting.vue'
+import TheStatus from './TheStatus.vue'
 import TheSetting from './TheSetting.vue'
 import TheUser from './TheUser.vue'
+import TheOthers from './TheOthers.vue'
 import Logout from '@/components/icons/logout.vue'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import { ShowWhichEnum } from '@/enums/enums'
 
 const userStore = useUserStore()
 const router = useRouter()
-// 控制面板的状态
-enum ShowWhichEnum {
-  Status = 'status',
-  Setting = 'setting',
-  UserCenter = 'usercenter',
-}
-const ShowingArray = [ShowWhichEnum.Status, ShowWhichEnum.Setting, ShowWhichEnum.UserCenter]
+
+const ShowingArray = [
+  ShowWhichEnum.Status,
+  ShowWhichEnum.Setting,
+  ShowWhichEnum.UserCenter,
+  ShowWhichEnum.Other,
+]
 const ShowingIndex = ref<number>(0)
 const Showing = ref<string>(ShowWhichEnum.Status)
 

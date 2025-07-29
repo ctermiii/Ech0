@@ -34,7 +34,7 @@ var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.AdaptiveColor{
-			Light: "#0000FF", Dark: "#f7b457ff",
+			Light: "#4338ca", Dark: "#f7b457ff",
 		})
 
 	// 高亮样式
@@ -42,7 +42,7 @@ var (
 			Bold(false).
 			Italic(true).
 			Foreground(lipgloss.AdaptiveColor{
-			Light: "#0000FF", Dark: "#53b7f5ff",
+			Light: "#7c3aed", Dark: "#53b7f5ff",
 		})
 
 	// 外框
@@ -82,15 +82,14 @@ func gradientBanner(banner string) string {
 	lines := strings.Split(banner, "\n")
 	var rendered []string
 
-	// Rose Pine Moon 渐变色调：由暗到亮，典雅梦幻
 	colors := []string{
-		"#232136", // Base
-		"#393552", // Surface
-		"#6E6A86", // Overlay
-		"#EA9A97", // Love
-		"#C4A7E7", // Iris
-		"#9CCFD8", // Foam
-		"#F6C177", // Gold
+		"#FF7F7F", // 珊瑚红
+		"#FFB347", // 桃橙色
+		"#FFEB9C", // 金黄色
+		"#B8E6B8", // 薄荷绿
+		"#87CEEB", // 天空蓝
+		"#DDA0DD", // 梅花紫
+		"#F0E68C", // 卡其色
 	}
 
 	for i, line := range lines {

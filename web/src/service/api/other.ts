@@ -1,4 +1,4 @@
-import { request } from '../request'
+import { request, downloadFile } from '../request'
 
 // 上传音乐
 export function fetchUploadMusic(file: File) {
@@ -31,6 +31,22 @@ export function fetchGetMusic() {
 export function fetchHelloEch0() {
   return request<App.Api.Ech0.HelloEch0>({
     url: '/hello',
+    method: 'GET',
+  })
+}
+
+// 执行备份
+export function fetchBackup() {
+  return request({
+    url: '/backup',
+    method: 'GET',
+  })
+}
+
+// 导出备份 - 使用专门的下载函数
+export function fetchExportBackup() {
+  return downloadFile({
+    url: '/backup/export',
     method: 'GET',
   })
 }

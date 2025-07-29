@@ -1,7 +1,6 @@
 package router
 
 import (
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/lin-snow/ech0/internal/di"
 	"github.com/lin-snow/ech0/internal/middleware"
@@ -15,13 +14,25 @@ type AppRouterGroup struct {
 
 // SetupRouter 配置路由
 func SetupRouter(r *gin.Engine, h *di.Handlers) {
-	// Setup Frontend
-	r.Use(static.Serve("/", static.LocalFile("./template", true)))
+	// === 使用本地目录提供前端 ===)
+	// // Setup Frontend
+	// r.Use(static.Serve("/", static.LocalFile("./template", false)))
+	// // 由于Vue3 和SPA模式，所以处理匹配不到的路由(重定向到index.html)
+	// r.NoRoute(func(c *gin.Context) {
+	// 	c.File("./template/index.html")
+	// })
+
+	// === 使用 embed 提供前端 ===)
+	setupTemplateRoutes(r, h)
+
+	// ===     静态资源映射     ===
 	r.Static("api/images", "./data/images")
 
+	// ===        中间件        ===
 	// Setup Middleware
 	setupMiddleware(r)
 
+	// ===  路由组与各模块路由  ===
 	// Setup Router Groups
 	appRouterGroup := setupRouterGroup(r)
 
@@ -45,14 +56,6 @@ func SetupRouter(r *gin.Engine, h *di.Handlers) {
 
 	// Setup Connect Routes
 	setupConnectRoutes(appRouterGroup, h)
-
-	// 由于Vue3 和SPA模式，所以处理匹配不到的路由(重定向到index.html)
-	r.NoRoute(func(c *gin.Context) {
-		c.File("./template/index.html")
-	})
-
-	// Setup No Routes
-	setupNoRoutes(r)
 }
 
 // setupRouterGroup 初始化路由组

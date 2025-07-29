@@ -9,6 +9,7 @@ import (
 	"time"
 
 	echoRepository "github.com/lin-snow/ech0/internal/repository/echo"
+	"go.uber.org/zap"
 
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/connect"
@@ -17,6 +18,7 @@ import (
 	commonService "github.com/lin-snow/ech0/internal/service/common"
 	settingService "github.com/lin-snow/ech0/internal/service/setting"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
 )
 
 type ConnectService struct {
@@ -184,7 +186,7 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 			for attempt := 0; attempt < maxRetries; attempt++ {
 				select {
 				case <-ctx.Done():
-					fmt.Printf("[连接信息获取取消] 地址: %s，原因: 总体超时\n", conn.ConnectURL)
+					logUtil.GetLogger().Info("[连接信息获取取消]", zap.String("地址", conn.ConnectURL), zap.Error(ctx.Err()))
 					return // 总体超时直接退出
 				default:
 				}
@@ -209,11 +211,19 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 
 				if err != nil {
 					lastErr = err
-					fmt.Printf("[连接信息获取失败] 地址: %s，第%d次尝试，错误: %v\n", conn.ConnectURL, attempt+1, err)
+					logUtil.GetLogger().Error("[连接信息获取失败]",
+						zap.String("地址", conn.ConnectURL),
+						zap.Int("尝试次数", attempt+1),
+						zap.Error(err),
+					)
 
 					// 如果是最后一次重试，记录最终失败
 					if attempt == maxRetries-1 {
-						fmt.Printf("[连接信息最终失败] 地址: %s，已重试%d次，最后错误: %v\n", conn.ConnectURL, maxRetries, lastErr)
+						logUtil.GetLogger().Error("[连接信息最终失败]",
+							zap.String("地址", conn.ConnectURL),
+							zap.Int("已重试次数", maxRetries),
+							zap.Error(lastErr),
+						)
 					}
 					continue
 				}
@@ -221,10 +231,18 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 				var connectInfo commonModel.Result[model.Connect]
 				if err := json.Unmarshal(resp, &connectInfo); err != nil {
 					lastErr = fmt.Errorf("JSON解析失败: %w", err)
-					fmt.Printf("[连接信息解析失败] 地址: %s，第%d次尝试，错误: %v\n", conn.ConnectURL, attempt+1, lastErr)
+					logUtil.GetLogger().Error("[连接信息解析失败]",
+						zap.String("地址", conn.ConnectURL),
+						zap.Int("尝试次数", attempt+1),
+						zap.Error(lastErr),
+					)
 
 					if attempt == maxRetries-1 {
-						fmt.Printf("[连接信息最终失败] 地址: %s，已重试%d次，最后错误: %v\n", conn.ConnectURL, maxRetries, lastErr)
+						logUtil.GetLogger().Error("[连接信息最终失败]",
+							zap.String("地址", conn.ConnectURL),
+							zap.Int("已重试次数", maxRetries),
+							zap.Error(lastErr),
+						)
 					}
 					continue
 				}
@@ -232,20 +250,36 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 				// 验证响应数据
 				if connectInfo.Code != 1 {
 					lastErr = fmt.Errorf("响应码无效: %d, 消息: %s", connectInfo.Code, connectInfo.Message)
-					fmt.Printf("[连接信息校验失败] 地址: %s，第%d次尝试，错误: %v\n", conn.ConnectURL, attempt+1, lastErr)
+					logUtil.GetLogger().Error("[连接信息校验失败]",
+						zap.String("地址", conn.ConnectURL),
+						zap.Int("尝试次数", attempt+1),
+						zap.Error(lastErr),
+					)
 
 					if attempt == maxRetries-1 {
-						fmt.Printf("[连接信息最终失败] 地址: %s，已重试%d次，最后错误: %v\n", conn.ConnectURL, maxRetries, lastErr)
+						logUtil.GetLogger().Error("[连接信息最终失败]",
+							zap.String("地址", conn.ConnectURL),
+							zap.Int("已重试次数", maxRetries),
+							zap.Error(lastErr),
+						)
 					}
 					continue
 				}
 
 				if connectInfo.Data.ServerURL == "" {
 					lastErr = fmt.Errorf("服务器URL为空")
-					fmt.Printf("[连接信息校验失败] 地址: %s，第%d次尝试，错误: %v\n", conn.ConnectURL, attempt+1, lastErr)
+					logUtil.GetLogger().Error("[连接信息校验失败]",
+						zap.String("地址", conn.ConnectURL),
+						zap.Int("尝试次数", attempt+1),
+						zap.Error(lastErr),
+					)
 
 					if attempt == maxRetries-1 {
-						fmt.Printf("[连接信息最终失败] 地址: %s，已重试%d次，最后错误: %v\n", conn.ConnectURL, maxRetries, lastErr)
+						logUtil.GetLogger().Error("[连接信息最终失败]",
+							zap.String("地址", conn.ConnectURL),
+							zap.Int("已重试次数", maxRetries),
+							zap.Error(lastErr),
+						)
 					}
 					continue
 				}
@@ -254,13 +288,19 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 				seenMutex.Lock()
 				if _, exists := seenURLs[connectInfo.Data.ServerURL]; exists {
 					seenMutex.Unlock()
-					fmt.Printf("[连接信息重复] 地址: %s，ServerURL: %s 已存在\n", conn.ConnectURL, connectInfo.Data.ServerURL)
+					logUtil.GetLogger().Info("[连接信息重复]",
+						zap.String("地址", conn.ConnectURL),
+						zap.String("ServerURL", connectInfo.Data.ServerURL),
+					)
 					return // 重复数据，直接返回
 				}
 				seenURLs[connectInfo.Data.ServerURL] = struct{}{}
 				seenMutex.Unlock()
 
-				fmt.Printf("[连接信息获取成功] 地址: %s，服务器: %s\n", conn.ConnectURL, connectInfo.Data.ServerName)
+				logUtil.GetLogger().Info("[连接信息获取成功]",
+					zap.String("地址", conn.ConnectURL),
+					zap.String("服务器", connectInfo.Data.ServerName),
+				)
 				connectChan <- connectInfo.Data
 				return // 成功处理，退出重试循环
 			}
@@ -279,10 +319,10 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 	select {
 	case <-done:
 		// 正常收集完毕
-		fmt.Printf("[连接信息收集完成] 开始处理收集到的连接\n")
+		logUtil.GetLogger().Info("[连接信息收集完成] 开始处理收集到的连接")
 	case <-ctx.Done():
 		// 超时，但仍然处理已收集到的数据
-		fmt.Printf("[连接信息收集超时] 处理已收集到的部分连接\n")
+		logUtil.GetLogger().Info("[连接信息收集超时] 处理已收集到的部分连接")
 	}
 
 	// 收集所有有效的连接信息
@@ -293,7 +333,7 @@ func (connectService *ConnectService) GetConnectsInfo() ([]model.Connect, error)
 		connectList = append(connectList, connect)
 	}
 
-	fmt.Printf("[连接信息汇总] 总共获取到 %d 个有效连接\n", len(connectList))
+	logUtil.GetLogger().Info("[连接信息汇总]", zap.Int("有效连接数", len(connectList)))
 	return connectList, nil
 }
 

@@ -16,4 +16,6 @@ func setupCommonRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.AuthRouterGroup.DELETE("/images/delete", h.CommonHandler.DeleteImage())
 	appRouterGroup.AuthRouterGroup.POST("/audios/upload", h.CommonHandler.UploadAudio())
 	appRouterGroup.AuthRouterGroup.DELETE("/audios/delete", h.CommonHandler.DeleteAudio())
+	appRouterGroup.AuthRouterGroup.GET("/backup", h.BackupHandler.Backup())
+	appRouterGroup.AuthRouterGroup.GET("/backup/export", h.BackupHandler.ExportBackup())
 }

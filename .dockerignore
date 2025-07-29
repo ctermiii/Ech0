@@ -9,6 +9,4 @@ node_modules/
 
 web/dist/
 
-web_old/node_modules
-
 web/node_modules

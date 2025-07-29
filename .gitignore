@@ -57,13 +57,17 @@ test/
 # Recommended template: Node.gitignore
 
 node_modules/
-dist/
+web/dist/
 npm-debug.log
 yarn-error.log
 
 # End of https://www.toptal.com/developers/gitignore/api/go,vue,vuejs,visualstudiocode
 /data/*
 **/node_modules
+template/dist/**
+!template/dist/.keep
+/backup/*
+quality-report.md
 
 .idea
 .VSCodeCounter

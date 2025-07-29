@@ -21,7 +21,7 @@ Ech0 is a lightweight, self-hosted platform designed for quick sharing of your i
 
 ## Core Features
 
-☁️ **Atomic Lightweight**: Uses less than **15MB** RAM, image size under **35MB**, stores data in a single SQLite file  
+☁️ **Atomic Lightweight**: Uses less than **15MB** RAM, image size under **40MB**, stores data in a single SQLite file  
 🚀 **Fast Deployment**: No configuration needed, just one command from install to use  
 ✍️ **Distraction-Free Writing**: Clean online Markdown editor, **supports rich Markdown plugins and preview**  
 📦 **Data Sovereignty**: All content stored locally in SQLite, supports RSS subscription  

@@ -72,6 +72,7 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { ShowWhichEnum } from '@/enums/enums'
+import { theToast } from '@/utils/toast'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -92,6 +93,12 @@ const changeShow = () => {
 }
 
 const handleLogout = () => {
+  // 检查是否登录
+  if (!userStore.isLogin) {
+    theToast.info('当前未登录')
+    return
+  }
+
   // 弹出浏览器确认框
   if (confirm('确定要退出登录吗？')) {
     // 清除用户信息

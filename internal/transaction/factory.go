@@ -8,9 +8,9 @@ type TransactionManagerFactory struct {
 }
 
 // NewTransactionManagerFactory 事务管理器工厂构造函数
-func NewTransactionManagerFactory(db *gorm.DB) *TransactionManagerFactory {
+func NewTransactionManagerFactory(dbProvider func() *gorm.DB) *TransactionManagerFactory {
 	// 使用 TransactionManager 的构造函数创建 TransactionManager
-	tm := NewTransactionManager(db)
+	tm := NewTransactionManager(dbProvider)
 
 	return &TransactionManagerFactory{
 		tm: tm,

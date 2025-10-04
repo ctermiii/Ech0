@@ -19,19 +19,19 @@ import (
 	handler2 "github.com/lin-snow/ech0/internal/handler/user"
 	"github.com/lin-snow/ech0/internal/handler/web"
 	repository2 "github.com/lin-snow/ech0/internal/repository/common"
-	repository5 "github.com/lin-snow/ech0/internal/repository/connect"
+	repository6 "github.com/lin-snow/ech0/internal/repository/connect"
 	repository3 "github.com/lin-snow/ech0/internal/repository/echo"
-	repository6 "github.com/lin-snow/ech0/internal/repository/fediverse"
+	repository4 "github.com/lin-snow/ech0/internal/repository/fediverse"
 	"github.com/lin-snow/ech0/internal/repository/keyvalue"
-	repository4 "github.com/lin-snow/ech0/internal/repository/todo"
+	repository5 "github.com/lin-snow/ech0/internal/repository/todo"
 	"github.com/lin-snow/ech0/internal/repository/user"
-	service7 "github.com/lin-snow/ech0/internal/service/backup"
+	service8 "github.com/lin-snow/ech0/internal/service/backup"
 	"github.com/lin-snow/ech0/internal/service/common"
-	service6 "github.com/lin-snow/ech0/internal/service/connect"
-	service4 "github.com/lin-snow/ech0/internal/service/echo"
-	service8 "github.com/lin-snow/ech0/internal/service/fediverse"
+	service7 "github.com/lin-snow/ech0/internal/service/connect"
+	service5 "github.com/lin-snow/ech0/internal/service/echo"
+	service4 "github.com/lin-snow/ech0/internal/service/fediverse"
 	service2 "github.com/lin-snow/ech0/internal/service/setting"
-	service5 "github.com/lin-snow/ech0/internal/service/todo"
+	service6 "github.com/lin-snow/ech0/internal/service/todo"
 	service3 "github.com/lin-snow/ech0/internal/service/user"
 	"github.com/lin-snow/ech0/internal/task"
 	"github.com/lin-snow/ech0/internal/transaction"
@@ -41,43 +41,44 @@ import (
 // Injectors from wire.go:
 
 // BuildHandlers 使用wire生成的代码来构建Handlers实例
-func BuildHandlers(db *gorm.DB, cacheFactory *cache.CacheFactory, tmFactory *transaction.TransactionManagerFactory) (*Handlers, error) {
+func BuildHandlers(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory, tmFactory *transaction.TransactionManagerFactory) (*Handlers, error) {
 	webHandler := handler.NewWebHandler()
 	transactionManager := ProvideTransactionManager(tmFactory)
 	iCache := ProvideCache(cacheFactory)
-	userRepositoryInterface := repository.NewUserRepository(db, iCache)
-	commonRepositoryInterface := repository2.NewCommonRepository(db)
-	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(db, iCache)
-	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface)
+	userRepositoryInterface := repository.NewUserRepository(dbProvider, iCache)
+	commonRepositoryInterface := repository2.NewCommonRepository(dbProvider)
+	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
+	echoRepositoryInterface := repository3.NewEchoRepository(dbProvider, iCache)
+	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface, echoRepositoryInterface)
 	settingServiceInterface := service2.NewSettingService(transactionManager, commonServiceInterface, keyValueRepositoryInterface)
 	userServiceInterface := service3.NewUserService(transactionManager, userRepositoryInterface, settingServiceInterface)
 	userHandler := handler2.NewUserHandler(userServiceInterface)
-	echoRepositoryInterface := repository3.NewEchoRepository(db, iCache)
-	echoServiceInterface := service4.NewEchoService(transactionManager, commonServiceInterface, echoRepositoryInterface, commonRepositoryInterface)
+	fediverseRepositoryInterface := repository4.NewFediverseRepository(dbProvider)
+	fediverseServiceInterface := service4.NewFediverseService(transactionManager, fediverseRepositoryInterface, userRepositoryInterface, settingServiceInterface, echoRepositoryInterface, commonServiceInterface)
+	echoServiceInterface := service5.NewEchoService(transactionManager, commonServiceInterface, echoRepositoryInterface, commonRepositoryInterface, fediverseServiceInterface)
 	echoHandler := handler3.NewEchoHandler(echoServiceInterface)
 	commonHandler := handler4.NewCommonHandler(commonServiceInterface)
 	settingHandler := handler5.NewSettingHandler(settingServiceInterface)
-	todoRepositoryInterface := repository4.NewTodoRepository(db, iCache)
-	todoServiceInterface := service5.NewTodoService(transactionManager, todoRepositoryInterface, commonServiceInterface)
+	todoRepositoryInterface := repository5.NewTodoRepository(dbProvider, iCache)
+	todoServiceInterface := service6.NewTodoService(transactionManager, todoRepositoryInterface, commonServiceInterface)
 	todoHandler := handler6.NewTodoHandler(todoServiceInterface)
-	connectRepositoryInterface := repository5.NewConnectRepository(db)
-	connectServiceInterface := service6.NewConnectService(transactionManager, connectRepositoryInterface, echoRepositoryInterface, commonServiceInterface, settingServiceInterface)
+	connectRepositoryInterface := repository6.NewConnectRepository(dbProvider)
+	connectServiceInterface := service7.NewConnectService(transactionManager, connectRepositoryInterface, echoRepositoryInterface, commonServiceInterface, settingServiceInterface)
 	connectHandler := handler7.NewConnectHandler(connectServiceInterface)
-	backupServiceInterface := service7.NewBackupService(commonServiceInterface)
+	backupServiceInterface := service8.NewBackupService(commonServiceInterface)
 	backupHandler := handler8.NewBackupHandler(backupServiceInterface)
-	fediverseRepositoryInterface := repository6.NewFediverseRepository(db)
-	fediverseServiceInterface := service8.NewFediverseService(transactionManager, fediverseRepositoryInterface, userRepositoryInterface, settingServiceInterface, echoServiceInterface)
 	fediverseHandler := handler9.NewFediverseHandler(fediverseServiceInterface)
 	handlers := NewHandlers(webHandler, userHandler, echoHandler, commonHandler, settingHandler, todoHandler, connectHandler, backupHandler, fediverseHandler)
 	return handlers, nil
 }
 
-func BuildTasker(db *gorm.DB, cacheFactory *cache.CacheFactory, tmFactory *transaction.TransactionManagerFactory) (*task.Tasker, error) {
+func BuildTasker(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory, tmFactory *transaction.TransactionManagerFactory) (*task.Tasker, error) {
 	transactionManager := ProvideTransactionManager(tmFactory)
-	commonRepositoryInterface := repository2.NewCommonRepository(db)
+	commonRepositoryInterface := repository2.NewCommonRepository(dbProvider)
 	iCache := ProvideCache(cacheFactory)
-	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(db, iCache)
-	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface)
+	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
+	echoRepositoryInterface := repository3.NewEchoRepository(dbProvider, iCache)
+	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface, echoRepositoryInterface)
 	tasker := task.NewTasker(commonServiceInterface)
 	return tasker, nil
 }
@@ -101,7 +102,7 @@ var WebSet = wire.NewSet(handler.NewWebHandler)
 var UserSet = wire.NewSet(repository.NewUserRepository, service3.NewUserService, handler2.NewUserHandler)
 
 // EchoSet 包含了构建 EchoHandler 所需的所有 Provider
-var EchoSet = wire.NewSet(repository3.NewEchoRepository, service4.NewEchoService, handler3.NewEchoHandler)
+var EchoSet = wire.NewSet(repository3.NewEchoRepository, service5.NewEchoService, handler3.NewEchoHandler)
 
 // CommonSet 包含了构建 CommonHandler 所需的所有 Provider
 var CommonSet = wire.NewSet(repository2.NewCommonRepository, service.NewCommonService, handler4.NewCommonHandler)
@@ -110,16 +111,16 @@ var CommonSet = wire.NewSet(repository2.NewCommonRepository, service.NewCommonSe
 var SettingSet = wire.NewSet(keyvalue.NewKeyValueRepository, service2.NewSettingService, handler5.NewSettingHandler)
 
 // TodoSet 包含了构建 TodoHandler 所需的所有 Provider
-var TodoSet = wire.NewSet(repository4.NewTodoRepository, service5.NewTodoService, handler6.NewTodoHandler)
+var TodoSet = wire.NewSet(repository5.NewTodoRepository, service6.NewTodoService, handler6.NewTodoHandler)
 
 // ConnectSet 包含了构建 ConnectHandler 所需的所有 Provider
-var ConnectSet = wire.NewSet(repository5.NewConnectRepository, service6.NewConnectService, handler7.NewConnectHandler)
+var ConnectSet = wire.NewSet(repository6.NewConnectRepository, service7.NewConnectService, handler7.NewConnectHandler)
 
 // BackupSet 包含了构建 BackupHandler 所需的所有 Provider
-var BackupSet = wire.NewSet(handler8.NewBackupHandler, service7.NewBackupService)
+var BackupSet = wire.NewSet(handler8.NewBackupHandler, service8.NewBackupService)
 
 // TaskSet 包含了构建 Tasker 所需的所有 Provider
 var TaskSet = wire.NewSet(task.NewTasker)
 
 // FediverseSet 包含了构建 Fediverse 所需的所有 Provider
-var FediverseSet = wire.NewSet(repository6.NewFediverseRepository, service8.NewFediverseService, handler9.NewFediverseHandler)
+var FediverseSet = wire.NewSet(repository4.NewFediverseRepository, service4.NewFediverseService, handler9.NewFediverseHandler)

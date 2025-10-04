@@ -63,6 +63,7 @@ import Audio from '@/components/icons/audio.vue'
 
 import { Mode, ExtensionType } from '@/enums/enums'
 import { useTodoStore } from '@/stores/todo'
+import { theToast } from '@/utils/toast'
 
 const mode = defineModel<Mode>('mode', {
   required: true,
@@ -91,7 +92,8 @@ const handleTodo = () => {
 }
 
 const handlePlayMusic = () => {
-  mode.value = Mode.PlayMusic
+  theToast.info('音乐播放器模式维护中，敬请期待！')
+  // mode.value = Mode.PlayMusic
 }
 </script>
 

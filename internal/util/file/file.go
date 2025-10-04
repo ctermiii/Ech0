@@ -6,7 +6,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"time"
 
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 
@@ -313,6 +315,158 @@ func FileExists(path string) bool {
 	return err == nil
 }
 
+// CopyDirectory 复制整个目录到目标路径（会清空目标目录后再复制）
+func CopyDirectory(src, dest string) error {
+	if src == "" || dest == "" {
+		return fmt.Errorf("源目录和目标目录不能为空")
+	}
+
+	// 检查源目录
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return fmt.Errorf("无法访问源目录 %s: %w", src, err)
+	}
+	if !srcInfo.IsDir() {
+		return fmt.Errorf("源路径 %s 不是目录", src)
+	}
+
+	// 防止把源复制到自身
+	srcAbs, err := filepath.Abs(src)
+	if err != nil {
+		return fmt.Errorf("获取源目录绝对路径失败: %w", err)
+	}
+	destAbs, err := filepath.Abs(dest)
+	if err != nil {
+		return fmt.Errorf("获取目标目录绝对路径失败: %w", err)
+	}
+	if srcAbs == destAbs {
+		return fmt.Errorf("源目录和目标目录不能相同: %s", srcAbs)
+	}
+	if strings.HasPrefix(destAbs, srcAbs+string(os.PathSeparator)) {
+		return fmt.Errorf("目标目录 %s 不能位于源目录 %s 内", destAbs, srcAbs)
+	}
+
+	if err := os.MkdirAll(destAbs, srcInfo.Mode()); err != nil {
+		return fmt.Errorf("创建目标目录失败: %w", err)
+	}
+
+	return filepath.Walk(srcAbs, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return fmt.Errorf("遍历目录 %s 时出错: %w", path, walkErr)
+		}
+
+		relPath, err := filepath.Rel(srcAbs, path)
+		if err != nil {
+			return fmt.Errorf("计算相对路径失败: %w", err)
+		}
+		if relPath == "." {
+			return nil
+		}
+
+		targetPath := filepath.Join(destAbs, relPath)
+
+		if info.IsDir() {
+			if err := os.MkdirAll(targetPath, info.Mode()); err != nil {
+				return fmt.Errorf("创建目录 %s 失败: %w", targetPath, err)
+			}
+			return nil
+		}
+
+		if info.Mode()&os.ModeSymlink != 0 {
+			if err := ensureRemoved(targetPath); err != nil {
+				return err
+			}
+			linkTarget, err := os.Readlink(path)
+			if err != nil {
+				return fmt.Errorf("读取符号链接 %s 失败: %w", path, err)
+			}
+			if err := os.Symlink(linkTarget, targetPath); err != nil {
+				return fmt.Errorf("创建符号链接 %s -> %s 失败: %w", targetPath, linkTarget, err)
+			}
+			return nil
+		}
+
+		if err := ensureDir(filepath.Dir(targetPath)); err != nil {
+			return err
+		}
+
+		if err := copyFile(path, targetPath, info.Mode()); err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func ensureDir(dir string) error {
+	return os.MkdirAll(dir, 0755)
+}
+
+func ensureRemoved(path string) error {
+	if _, err := os.Lstat(path); err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("检查路径 %s 失败: %w", path, err)
+	}
+	return os.RemoveAll(path)
+}
+
+func copyFile(src, dest string, perm os.FileMode) error {
+	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+		return fmt.Errorf("创建文件目录失败: %w", err)
+	}
+
+	in, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("打开源文件 %s 失败: %w", src, err)
+	}
+	defer in.Close()
+
+	out, err := os.OpenFile(dest, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, perm)
+	if err != nil {
+		return fmt.Errorf("创建目标文件 %s 失败: %w", dest, err)
+	}
+	defer func() {
+		_ = out.Close()
+	}()
+
+	if _, err := io.Copy(out, in); err != nil {
+		return fmt.Errorf("复制文件到 %s 失败: %w", dest, err)
+	}
+
+	return nil
+}
+
+func removeAllWithRetry(path string, retries int, delay time.Duration) error {
+	for attempt := 0; attempt <= retries; attempt++ {
+		if err := os.RemoveAll(path); err != nil {
+			if !shouldRetrySharingViolation(err) || attempt == retries {
+				return err
+			}
+			time.Sleep(delay)
+			continue
+		}
+		return nil
+	}
+	return nil
+}
+
+func shouldRetrySharingViolation(err error) bool {
+	if runtime.GOOS != "windows" {
+		return false
+	}
+	if pathErr, ok := err.(*os.PathError); ok {
+		if pathErr.Err != nil && strings.Contains(strings.ToLower(pathErr.Err.Error()), "used by another process") {
+			return true
+		}
+	}
+	if err != nil && strings.Contains(strings.ToLower(err.Error()), "used by another process") {
+		return true
+	}
+	return false
+}
+
 // cleanBackupDir 清理备份目录
 func cleanBackupDir(path string) error {
 	entries, err := os.ReadDir(path)
@@ -334,7 +488,7 @@ func cleanBackupDir(path string) error {
 func GetImageURL(image echoModel.Image, serverURL string) string {
 	switch image.ImageSource {
 	case echoModel.ImageSourceLocal:
-		return fmt.Sprintf("%s/images/%s", serverURL, httpUtil.TrimURL(image.ImageURL))
+		return fmt.Sprintf("%s/api/%s", serverURL, httpUtil.TrimURL(image.ImageURL))
 	case echoModel.ImageSourceURL:
 		return image.ImageURL
 	case echoModel.ImageSourceS3:
@@ -342,6 +496,6 @@ func GetImageURL(image echoModel.Image, serverURL string) string {
 	case echoModel.ImageSourceR2:
 		return image.ImageURL
 	default:
-		return fmt.Sprintf("%s/images/%s", serverURL, httpUtil.TrimURL(image.ImageURL))
+		return fmt.Sprintf("%s/api/%s", serverURL, httpUtil.TrimURL(image.ImageURL))
 	}
 }

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"sync"
+	"fmt"
 
 	"github.com/lin-snow/ech0/internal/transaction"
 
@@ -13,6 +13,7 @@ import (
 	commonRepository "github.com/lin-snow/ech0/internal/repository/common"
 	repository "github.com/lin-snow/ech0/internal/repository/echo"
 	commonService "github.com/lin-snow/ech0/internal/service/common"
+	fediverseService "github.com/lin-snow/ech0/internal/service/fediverse"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 )
 
@@ -21,6 +22,7 @@ type EchoService struct {
 	commonService    commonService.CommonServiceInterface
 	echoRepository   repository.EchoRepositoryInterface
 	commonRepository commonRepository.CommonRepositoryInterface
+	fediverseService fediverseService.FediverseServiceInterface
 }
 
 func NewEchoService(
@@ -28,18 +30,20 @@ func NewEchoService(
 	commonService commonService.CommonServiceInterface,
 	echoRepository repository.EchoRepositoryInterface,
 	commonRepository commonRepository.CommonRepositoryInterface,
+	fediverseService fediverseService.FediverseServiceInterface,
 ) EchoServiceInterface {
 	return &EchoService{
 		txManager:        tm,
 		commonService:    commonService,
 		echoRepository:   echoRepository,
 		commonRepository: commonRepository,
+		fediverseService: fediverseService,
 	}
 }
 
 // PostEcho 创建新的Echo
 func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error {
-	return echoService.txManager.Run(func(ctx context.Context) error {
+	err := echoService.txManager.Run(func(ctx context.Context) error {
 		newEcho.UserID = userid
 
 		user, err := echoService.commonService.CommonGetUserByUserId(userid)
@@ -95,6 +99,23 @@ func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error
 		return echoService.echoRepository.CreateEcho(ctx, newEcho)
 	})
 
+	if err != nil {
+		return err
+	}
+
+	// 事务提交成功后再推送，确保已拿到持久化 ID
+	savedEcho, fetchErr := echoService.echoRepository.GetEchosById(newEcho.ID)
+	if fetchErr != nil {
+		return fetchErr
+	}
+	if savedEcho != nil {
+		if pushErr := echoService.fediverseService.PushEchoToFediverse(userid, *savedEcho); pushErr != nil {
+			// 推送失败不影响发布
+			fmt.Println("Error pushing Echo to Fediverse:", pushErr)
+		}
+	}
+
+	return nil
 }
 
 // GetEchosByPage 获取Echo列表，支持分页
@@ -131,7 +152,7 @@ func (echoService *EchoService) GetEchosByPage(userid uint, pageQueryDto commonM
 
 	// 处理echosByPage中的图片URL
 	for i := range result.Items {
-		echoService.RefreshEchoImageURL(userid, &result.Items[i])
+		echoService.commonService.RefreshEchoImageURL(&result.Items[i])
 	}
 
 	// 返回结果
@@ -195,7 +216,7 @@ func (echoService *EchoService) GetTodayEchos(userid uint) ([]model.Echo, error)
 
 	// 处理todayEchos中的图片URL
 	for i := range todayEchos {
-		echoService.RefreshEchoImageURL(userid, &todayEchos[i])
+		echoService.commonService.RefreshEchoImageURL(&todayEchos[i])
 	}
 
 	return todayEchos, nil
@@ -295,41 +316,8 @@ func (echoService *EchoService) GetEchoById(userId, id uint) (*model.Echo, error
 	}
 
 	// 刷新图片URL
-	echoService.RefreshEchoImageURL(userId, echo)
+	echoService.commonService.RefreshEchoImageURL(echo)
 
 	// 返回Echo
 	return echo, nil
-}
-
-// RefreshEchoImageURL 刷新Echo中的图片URL
-func (s *EchoService) RefreshEchoImageURL(userid uint, echo *model.Echo) {
-	_, s3setting, err := s.commonService.GetS3Client()
-	if err != nil {
-		return
-	}
-
-	// 用 channel 或 waitGroup 并发刷新 URL
-	var wg sync.WaitGroup
-	mu := sync.Mutex{}
-
-	for i := range echo.Images {
-		if echo.Images[i].ImageSource == model.ImageSourceS3 && echo.Images[i].ObjectKey != "" {
-			wg.Add(1)
-			go func(i int) {
-				defer wg.Done()
-				if newURL, err := s.commonService.GetS3ObjectURL(s3setting, echo.Images[i].ObjectKey); err == nil {
-					mu.Lock()
-					echo.Images[i].ImageURL = newURL
-					mu.Unlock()
-				}
-			}(i)
-		}
-	}
-
-	wg.Wait()
-
-	// 所有 URL 都拿到了，再一次性更新 DB
-	_ = s.txManager.Run(func(ctx context.Context) error {
-		return s.echoRepository.UpdateEcho(ctx, echo)
-	})
 }

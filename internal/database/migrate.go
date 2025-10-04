@@ -13,7 +13,7 @@ import (
 // UpdateMigration 执行数据库迁移，将旧版 Message 表的数据迁移到新版 Echo 表
 func UpdateMigration() {
 	// 确认旧表存在，否则无需迁移
-	if !DB.Migrator().HasTable(&echoModel.Message{}) {
+	if !GetDB().Migrator().HasTable(&echoModel.Message{}) {
 		// log.Println("未发现旧版 Message 表，无需迁移。")
 		return
 	}
@@ -22,7 +22,7 @@ func UpdateMigration() {
 	log.Println("开始执行迁移...")
 
 	var kvFlag commonModel.KeyValue
-	result := DB.First(&kvFlag, "key = ?", commonModel.MigrationKey).Error
+	result := GetDB().First(&kvFlag, "key = ?", commonModel.MigrationKey).Error
 
 	if result == nil {
 		// 如果找到了记录，说明已迁移
@@ -44,7 +44,7 @@ func UpdateMigration() {
 	// =================================================================
 	var messages []echoModel.Message
 	// 使用 Preload 一并加载关联的 Images
-	if err := DB.Preload("Images").Find(&messages).Error; err != nil {
+	if err := GetDB().Preload("Images").Find(&messages).Error; err != nil {
 		log.Fatalf("从旧表加载数据失败: %v", err)
 		return
 	}
@@ -58,7 +58,7 @@ func UpdateMigration() {
 	// =================================================================
 	// 步骤 2: 启动一个事务来执行所有数据库写操作
 	// =================================================================
-	err := DB.Transaction(func(tx *gorm.DB) error {
+	err := GetDB().Transaction(func(tx *gorm.DB) error {
 		// 步骤 3: 清空新表
 		// 注意删除顺序：先删除带有外键的表 (images)，再删除被引用的表 (echos)
 		log.Println("在事务中清空 echos 和 images 表...")

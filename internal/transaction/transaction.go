@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -15,7 +16,7 @@ type TransactionManager interface {
 	Run(fn func(ctx context.Context) error) error
 }
 
-func NewTransactionManager(db *gorm.DB) TransactionManager {
+func NewTransactionManager(dbProvider func() *gorm.DB) TransactionManager {
 	// 使用GORM提供的事务管理器
-	return NewGormTransactionManager(db)
+	return NewGormTransactionManager(dbProvider)
 }

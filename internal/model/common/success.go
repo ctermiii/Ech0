@@ -74,3 +74,13 @@ const (
 	EXPORT_BACKUP_SUCCESS = "导出备份成功"
 	IMPORT_BACKUP_SUCCESS = "导入备份成功"
 )
+
+// Fediverse 成功相关常量
+const (
+	FEDIVERSE_SEARCH_ACTOR_SUCCESS = "搜索 Actor 成功"
+	FEDIVERSE_FOLLOW_SUCCESS       = "关注请求已发送"
+	FEDIVERSE_UNFOLLOW_SUCCESS     = "取消关注请求已发送"
+	FEDIVERSE_LIKE_SUCCESS         = "点赞请求已发送"
+	FEDIVERSE_UNDO_LIKE_SUCCESS    = "取消点赞请求已发送"
+	FEDIVERSE_GET_FOLLOW_STATUS_SUCCESS = "获取关注状态成功"
+)

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"os"
 	"time"
 
@@ -73,5 +74,31 @@ func (backupService *BackupService) ExportBackup(ctx *gin.Context) error {
 
 	// 使用 Gin 的内置方法，支持 Range 请求
 	ctx.File(backupFilePath)
+	return nil
+}
+
+// ImportBackup 恢复备份
+func (backupService *BackupService) ImportBackup(ctx *gin.Context, userid uint, file *multipart.FileHeader) error {
+	user, err := backupService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
+
+	// 保存上传的文件到临时位置, (./temp/snapshot_时间戳.zip)
+	timestamp := time.Now().Unix()
+	tempFilePath := fmt.Sprintf("./temp/snapshot_%d.zip", timestamp)
+	if err := ctx.SaveUploadedFile(file, tempFilePath); err != nil {
+		return errors.New(commonModel.SNAPSHOT_UPLOAD_FAILED + ": " + err.Error())
+	}
+
+	// 执行恢复
+	if err := backup.ExcuteRestoreOnline(tempFilePath, timestamp); err != nil {
+		return errors.New(commonModel.SNAPSHOT_RESTORE_FAILED + ": " + err.Error())
+	}
+
 	return nil
 }

@@ -31,7 +31,7 @@ export const useUserStore = defineStore('userStore', () => {
         refreshCurrentUser()
 
         // 登录成功
-        theToast.success('登录成功')
+        theToast.success('登录成功,欢迎回来！🎉')
 
         // 清除echo数据
         const echoStore = useEchoStore()

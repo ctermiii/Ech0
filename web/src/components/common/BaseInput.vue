@@ -16,10 +16,10 @@
         :disabled="disabled"
         :readonly="readonly"
         :class="[
-          'block px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out shadow-sm sm:text-sm',
+          'block px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out shadow-sm sm:text-sm text-gray-600',
           disabled
-            ? 'bg-gray-100 cursor-not-allowed opacity-70'
-            : 'bg-white hover:border-orange-400',
+            ? 'bg-gray-100 cursor-not-allowed opacity-70 text-gray-400'
+            : 'bg-white hover:border-orange-400 focus:text-gray-700',
           customClass,
         ]"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"

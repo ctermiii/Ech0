@@ -47,18 +47,28 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import CreateBackup from '@/components/icons/createbackup.vue'
 import ExportBackup from '@/components/icons/exportbackup.vue'
 import RestoreBackup from '@/components/icons/restorebackup.vue'
-import { fetchBackup } from '@/service/api'
+import { fetchBackup, fetchImportBackup } from '@/service/api'
 import { theToast } from '@/utils/toast'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
+
+const userStore = useUserStore()
+const { isLogin } = storeToRefs(userStore)
 
 const handleBackup = async () => {
-  fetchBackup().then((res) => {
-    if (res.code === 1) {
-      theToast.success('备份成功')
-    }
+  await theToast.promise(fetchBackup(), {
+    loading: '备份中...',
+    success: (res) => (res.code === 1 ? '备份成功' : '备份失败'),
+    error: '备份失败',
   })
 }
 
 const handleBackupExport = async () => {
+  if (!isLogin.value) {
+    theToast.info('请登录后使用', { duration: 3000 })
+    return
+  }
+
   try {
     theToast.info('导出中...请稍等', {
       duration: 4000,
@@ -66,7 +76,10 @@ const handleBackupExport = async () => {
 
     // 1. 获取 token
     const token = localStorage.getItem('token')
-    const baseURL = import.meta.env.VITE_SERVICE_BASE_URL || ''
+    const baseURL =
+      import.meta.env.VITE_SERVICE_BASE_URL === '/'
+        ? window.location.origin
+        : import.meta.env.VITE_SERVICE_BASE_URL
     const downloadUrl = `${baseURL}/api/backup/export?token=${token}`
 
     // 创建隐藏的 a 标签触发下载
@@ -85,8 +98,32 @@ const handleBackupExport = async () => {
 }
 
 const handleBackupRestore = async () => {
-  theToast.info('功能开发中，请使用TUI/CLI模式执行恢复', {
-    duration: 3000,
-  })
+  if (!isLogin.value) {
+    theToast.info('请登录后使用', { duration: 3000 })
+    return
+  }
+
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.zip'
+  input.onchange = async (event: Event) => {
+    const target = event.target as HTMLInputElement
+    if (target.files && target.files.length > 0) {
+      const file = target.files[0]
+
+      await theToast.promise(
+        fetchImportBackup(file),
+        {
+          loading: '导入中,请不要关闭页面...',
+          success: (res) => (res.code === 1 ? '快照恢复成功🎉' : `导入失败: ${res.msg}`),
+          error: '导入失败,请尝试重新导入或使用TUI模式进行恢复',
+        },
+        {
+          duration: 5000,
+        },
+      )
+    }
+  }
+  input.click()
 }
 </script>

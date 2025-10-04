@@ -23,7 +23,7 @@
           class="w-7 h-7 flex items-center justify-center bg-white ring-1 ring-gray-200 ring-inset rounded-full shadow-sm hover:shadow-md transition"
         >
           <!-- 默认图标，展开后隐藏 -->
-          <More />
+          <More class="w-5 h-5" />
         </div>
 
         <!-- 展开后的按钮组 -->

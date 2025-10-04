@@ -9,4 +9,6 @@ import (
 func setupMiddleware(r *gin.Engine) {
 	// Cors middleware
 	r.Use(middleware.Cors())
+	// Global write guard middleware
+	r.Use(middleware.WriteGuard())
 }

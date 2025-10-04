@@ -50,3 +50,14 @@ export function fetchExportBackup() {
     method: 'GET',
   })
 }
+
+// 导入备份
+export function fetchImportBackup(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/backup/import',
+    method: 'POST',
+    data: formData,
+  })
+}

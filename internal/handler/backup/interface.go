@@ -12,5 +12,5 @@ type BackupHandlerInterface interface {
 	ExportBackup() gin.HandlerFunc
 
 	// ImportBackup 恢复备份
-	// ImportBackup() gin.HandlerFunc
+	ImportBackup() gin.HandlerFunc
 }

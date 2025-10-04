@@ -10,13 +10,13 @@ import (
 )
 
 type KeyValueRepository struct {
-	db    *gorm.DB
+	db    func() *gorm.DB
 	cache cache.ICache[string, any]
 }
 
-func NewKeyValueRepository(db *gorm.DB, cache cache.ICache[string, any]) KeyValueRepositoryInterface {
+func NewKeyValueRepository(dbProvider func() *gorm.DB, cache cache.ICache[string, any]) KeyValueRepositoryInterface {
 	return &KeyValueRepository{
-		db:    db,
+		db:    dbProvider,
 		cache: cache,
 	}
 }
@@ -26,7 +26,7 @@ func (keyvalueRepository *KeyValueRepository) getDB(ctx context.Context) *gorm.D
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return keyvalueRepository.db
+	return keyvalueRepository.db()
 }
 
 // GetKeyValue 根据键获取值
@@ -41,7 +41,7 @@ func (keyvalueRepository *KeyValueRepository) GetKeyValue(key string) (interface
 
 	// 缓存未命中，查询数据库
 	var kv model.KeyValue
-	if err := keyvalueRepository.db.Where("key = ?", key).First(&kv).Error; err != nil {
+	if err := keyvalueRepository.db().Where("key = ?", key).First(&kv).Error; err != nil {
 		return nil, err
 	}
 

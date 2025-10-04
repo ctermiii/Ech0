@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/lin-snow/ech0/internal/transaction"
@@ -22,6 +23,7 @@ import (
 	settingModel "github.com/lin-snow/ech0/internal/model/setting"
 	userModel "github.com/lin-snow/ech0/internal/model/user"
 	repository "github.com/lin-snow/ech0/internal/repository/common"
+	echoRepository "github.com/lin-snow/ech0/internal/repository/echo"
 	keyvalueRepository "github.com/lin-snow/ech0/internal/repository/keyvalue"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 	jsonUtil "github.com/lin-snow/ech0/internal/util/json"
@@ -34,17 +36,20 @@ type CommonService struct {
 	commonRepository   repository.CommonRepositoryInterface
 	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface
 	objStorage         storageUtil.ObjectStorage
+	echoRepository     echoRepository.EchoRepositoryInterface
 }
 
 func NewCommonService(
 	tm transaction.TransactionManager,
 	commonRepository repository.CommonRepositoryInterface,
 	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface,
+	echoRepository echoRepository.EchoRepositoryInterface,
 ) CommonServiceInterface {
 	return &CommonService{
 		txManager:          tm,
 		commonRepository:   commonRepository,
 		keyvalueRepository: keyvalueRepository,
+		echoRepository:     echoRepository,
 		objStorage:         nil,
 	}
 }
@@ -612,4 +617,36 @@ func (commonService *CommonService) CleanupTempFiles() error {
 	}
 
 	return nil
+}
+
+func (commonService *CommonService) RefreshEchoImageURL(echo *echoModel.Echo) {
+	_, s3setting, err := commonService.GetS3Client()
+	if err != nil {
+		return
+	}
+
+	// 用 channel 或 waitGroup 并发刷新 URL
+	var wg sync.WaitGroup
+	mu := sync.Mutex{}
+
+	for i := range echo.Images {
+		if echo.Images[i].ImageSource == echoModel.ImageSourceS3 && echo.Images[i].ObjectKey != "" {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				if newURL, err := commonService.GetS3ObjectURL(s3setting, echo.Images[i].ObjectKey); err == nil {
+					mu.Lock()
+					echo.Images[i].ImageURL = newURL
+					mu.Unlock()
+				}
+			}(i)
+		}
+	}
+
+	wg.Wait()
+
+	// 所有 URL 都拿到了，再一次性更新 DB
+	_ = commonService.txManager.Run(func(ctx context.Context) error {
+		return commonService.echoRepository.UpdateEcho(ctx, echo)
+	})
 }

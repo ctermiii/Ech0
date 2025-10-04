@@ -18,5 +18,6 @@ func setupCommonRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	appRouterGroup.AuthRouterGroup.POST("/audios/upload", h.CommonHandler.UploadAudio())
 	appRouterGroup.AuthRouterGroup.DELETE("/audios/delete", h.CommonHandler.DeleteAudio())
 	appRouterGroup.AuthRouterGroup.GET("/backup", h.BackupHandler.Backup())
+	appRouterGroup.AuthRouterGroup.POST("/backup/import", h.BackupHandler.ImportBackup())
 	appRouterGroup.AuthRouterGroup.PUT("/s3/presign", h.CommonHandler.GetS3PresignURL())
 }

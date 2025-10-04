@@ -3,6 +3,7 @@ package util
 import (
 	"os"
 	"path/filepath"
+	"sync"
 
 	model "github.com/lin-snow/ech0/internal/model/common"
 	"go.uber.org/zap"
@@ -11,7 +12,12 @@ import (
 )
 
 // Logger 全局日志记录器
-var Logger *zap.Logger
+var (
+	Logger        *zap.Logger
+	loggerMu      sync.Mutex
+	fileWriter    *lumberjack.Logger
+	currentConfig LogConfig
+)
 
 // LogConfig 日志配置
 type LogConfig struct {
@@ -60,12 +66,29 @@ func DefaultLogConfig() LogConfig {
 
 // InitLogger 使用默认配置初始化日志记录器
 func InitLogger() {
-	config := DefaultLogConfig()
-	InitLoggerWithConfig(config)
+	InitLoggerWithConfig(DefaultLogConfig())
 }
 
 // InitLoggerWithConfig 使用自定义配置初始化日志记录器
 func InitLoggerWithConfig(config LogConfig) {
+	loggerMu.Lock()
+	defer loggerMu.Unlock()
+
+	initializeLogger(config)
+}
+
+func initializeLogger(config LogConfig) {
+	currentConfig = config
+
+	if Logger != nil {
+		_ = Logger.Sync()
+		Logger = nil
+	}
+	if fileWriter != nil {
+		_ = fileWriter.Close()
+		fileWriter = nil
+	}
+
 	// 解析日志级别
 	level, err := zapcore.ParseLevel(config.Level)
 	if err != nil {
@@ -127,6 +150,7 @@ func InitLoggerWithConfig(config LogConfig) {
 			Compress:   config.File.Compress,
 			LocalTime:  true,
 		}
+		fileWriter = writer
 
 		var fileEncoder zapcore.Encoder
 		if config.Format == "json" {
@@ -161,10 +185,48 @@ func InitLoggerWithConfig(config LogConfig) {
 
 // GetLogger 获取日志记录器实例
 func GetLogger() *zap.Logger {
+	loggerMu.Lock()
+	defer loggerMu.Unlock()
+
 	if Logger == nil {
-		InitLogger()
+		cfg := currentConfig
+		if cfg == (LogConfig{}) {
+			cfg = DefaultLogConfig()
+		}
+		initializeLogger(cfg)
 	}
 	return Logger
+}
+
+// CloseLogger 关闭日志记录器，释放资源
+func CloseLogger() {
+	loggerMu.Lock()
+	defer loggerMu.Unlock()
+
+	if Logger != nil {
+		_ = Logger.Sync()
+		Logger = nil
+	}
+	if fileWriter != nil {
+		_ = fileWriter.Close()
+		fileWriter = nil
+	}
+}
+
+// ReopenLogger 使用最近的配置重新初始化日志
+func ReopenLogger() {
+	loggerMu.Lock()
+	defer loggerMu.Unlock()
+
+	if Logger != nil {
+		return
+	}
+
+	cfg := currentConfig
+	if cfg == (LogConfig{}) {
+		cfg = DefaultLogConfig()
+	}
+	initializeLogger(cfg)
 }
 
 // Debug 打印调试级别日志

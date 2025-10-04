@@ -15,7 +15,7 @@
         :readonly="readonly"
         :rows="rows"
         :class="[
-          'block w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out shadow-sm sm:text-sm',
+          'block w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out sm:text-sm',
           disabled
             ? 'bg-gray-100 cursor-not-allowed opacity-70'
             : 'bg-white hover:border-orange-400',

@@ -5,49 +5,42 @@
       <TheHeatMap />
     </div>
 
-    <div class="flex justify-center my-5">
-      <div class="text-gray-400 text-md">
-        <!-- 系统管理员 -->
-        <div>
-          <h1>
-            当前系统管理员：
-            <span class="ml-2">{{ status?.username }}</span>
-          </h1>
-        </div>
-        <!-- 当前登录用户 -->
-        <div>
-          <h1>
-            当前登录的用户：
-            <span class="ml-2">
-              {{ userStore?.user?.username ? userStore.user.username : '当前未登录' }}
-            </span>
-          </h1>
-        </div>
-        <!-- 当前共有Ech0 -->
-        <div>
-          <h1>
-            当前Echo总共有：
-            <span class="ml-2">{{ status?.total_echos }}</span>
-            <span class="ml-2">条</span>
-          </h1>
-        </div>
-      </div>
+    <!-- 系统状态 -->
+    <div class="justify-center my-1">
+      <TheStatusCard />
+    </div>
+
+    <!-- 当前在忙 -->
+    <div v-if="isLogin" class="justify-center my-2 px-9 md:px-11">
+      <TheTodoCard :todo="todos[0]" :index="0" :operative="false" @refresh="getTodos" />
+    </div>
+
+    <!-- Ech0 Connect -->
+    <div class="justify-center my-1">
+      <TheConnects />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { fetchGetStatus } from '@/service/api'
-import { onMounted, ref } from 'vue'
-import { useUserStore } from '@/stores/user'
 import TheHeatMap from '@/components/advanced/TheHeatMap.vue'
+import TheConnects from '@/views/connect/modules/TheConnects.vue'
+import TheStatusCard from '@/components/advanced/TheStatusCard.vue'
+import TheTodoCard from '@/components/advanced/TheTodoCard.vue'
 
-const status = ref<App.Api.Ech0.Status>()
+import { storeToRefs } from 'pinia'
+import { useUserStore } from '@/stores/user'
+import { useTodoStore } from '@/stores/todo'
+import { onMounted } from 'vue'
+const todoStore = useTodoStore()
 const userStore = useUserStore()
+const { isLogin } = storeToRefs(userStore)
+const { getTodos } = useTodoStore()
+const { todos } = storeToRefs(todoStore)
 
 onMounted(() => {
-  fetchGetStatus().then((res) => {
-    status.value = res.data
-  })
+  if (isLogin.value) {
+    getTodos()
+  }
 })
 </script>

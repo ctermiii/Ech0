@@ -3,7 +3,7 @@ name: Release with Embedded Frontend
 on:
   push:
     tags:
-      - 'v*'  # 触发条件：打 Tag，比如 v1.0.0
+      - "v*" # 触发条件：打 Tag，比如 v1.0.0
 
 permissions:
   contents: write
@@ -21,8 +21,8 @@ jobs:
             goarch: amd64
           - goos: linux
             goarch: arm64
-          - goos: windows
-            goarch: amd64
+          # - goos: windows
+          #   goarch: amd64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,9 +34,9 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: 23
-          cache: 'pnpm'
-          cache-dependency-path: 'web/pnpm-lock.yaml'
+          node-version: 24
+          cache: "pnpm"
+          cache-dependency-path: "web/pnpm-lock.yaml"
       - name: Install dependencies and build frontend
         working-directory: ./web
         run: pnpm install --frozen-lockfile && pnpm build --mode production
@@ -45,8 +45,8 @@ jobs:
       - name: Setup Go Environment
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.3'
-          cache-dependency-path: '**/go.sum'
+          go-version: "1.25.1"
+          cache-dependency-path: "**/go.sum"
       - name: Set Go proxy
         run: go env -w GOPROXY=https://proxy.golang.org,direct
 
@@ -56,7 +56,7 @@ jobs:
           wget -q https://github.com/lin-snow/musl-compilers/releases/download/2025-6-20/aarch64-linux-musl-cross.tgz
           tar -xf aarch64-linux-musl-cross.tgz
           echo "$(pwd)/aarch64-linux-musl-cross/bin" >> $GITHUB_PATH
-      
+
       - name: Install mingw-w64 for Windows cross-compiling
         if: matrix.goos == 'windows'
         run: sudo apt-get update && sudo apt-get install -y mingw-w64
@@ -76,7 +76,7 @@ jobs:
           if [ "${{ matrix.goos }}" == "windows" ]; then
             OUTPUT_NAME="${OUTPUT_NAME}.exe"
           fi
-  
+
           # Build the binary. Go's 'embed' will automatically find the frontend
           # files built in the previous steps.
           go build -tags netgo -ldflags "$STATIC_LDFLAGS" -o "${OUTPUT_NAME}" ./main.go
@@ -125,12 +125,12 @@ jobs:
           find ./backend-artifacts -name "*.tar.gz" -exec tar -xzvf {} -C dist/ \;
 
       # ✅ 创建 GitHub Release
+      # 暂时忽略 ./backend-artifacts/*.exe
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             ./backend-artifacts/*.tar.gz
-            ./backend-artifacts/*.exe
           draft: true
           prerelease: false
         env:
@@ -139,7 +139,7 @@ jobs:
   build-docker:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
-    needs: [build] 
+    needs: [build]
     steps:
       - name: 🔄 Checkout source code
         uses: actions/checkout@v4
@@ -156,19 +156,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
-          
+
       - name: 🐳 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: 📦 Set up QEMU
         uses: docker/setup-qemu-action@v3
-        
+
       - name: 📦 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: 📦 Build and push
         uses: docker/build-push-action@v6
         with:

@@ -10,13 +10,13 @@ import (
 )
 
 type UserRepository struct {
-	db    *gorm.DB
+	db    func() *gorm.DB
 	cache cache.ICache[string, any]
 }
 
-func NewUserRepository(db *gorm.DB, cache cache.ICache[string, any]) UserRepositoryInterface {
+func NewUserRepository(dbProvider func() *gorm.DB, cache cache.ICache[string, any]) UserRepositoryInterface {
 	return &UserRepository{
-		db:    db,
+		db:    dbProvider,
 		cache: cache,
 	}
 }
@@ -26,7 +26,7 @@ func (userRepository *UserRepository) getDB(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return userRepository.db
+	return userRepository.db()
 }
 
 // GetUserByUsername 根据用户名获取用户
@@ -42,7 +42,7 @@ func (userRepository *UserRepository) GetUserByUsername(username string) (model.
 
 	// 缓存未命中，查询数据库
 	user := model.User{}
-	err := userRepository.db.Where("username = ?", username).First(&user).Error
+	err := userRepository.db().Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return model.User{}, err
 	}
@@ -56,7 +56,7 @@ func (userRepository *UserRepository) GetUserByUsername(username string) (model.
 // GetAllUsers 获取所有用户
 func (userRepository *UserRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
-	err := userRepository.db.Find(&users).Error
+	err := userRepository.db().Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (userRepository *UserRepository) GetUserByID(id int) (model.User, error) {
 	}
 
 	var user model.User
-	if err := userRepository.db.First(&user, id).Error; err != nil {
+	if err := userRepository.db().First(&user, id).Error; err != nil {
 		return user, err
 	}
 
@@ -109,7 +109,7 @@ func (userRepository *UserRepository) GetSysAdmin() (model.User, error) {
 
 	// 获取系统管理员（首个注册的用户）
 	user := model.User{}
-	err := userRepository.db.Where("is_admin = ?", true).First(&user).Error
+	err := userRepository.db().Where("is_admin = ?", true).First(&user).Error
 	if err != nil {
 		return model.User{}, err
 	}

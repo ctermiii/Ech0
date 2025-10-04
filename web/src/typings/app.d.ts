@@ -206,6 +206,38 @@ declare namespace App {
       }
     }
 
+    namespace Fediverse {
+      type Actor = Record<string, unknown>
+
+      type FollowActionRequest = {
+        targetActor: string
+      }
+
+      type FollowResponse = {
+        activityId: string
+      }
+
+      // type LikeActionRequest = {
+      //   targetActor: string
+      //   object: string
+      //   objectType?: string
+      // }
+
+      // type UnfollowResponse = {
+      //   activityId: string
+      //   followActivityId?: string
+      // }
+
+      // type LikeResponse = {
+      //   activityId: string
+      // }
+
+      // type UndoLikeResponse = {
+      //   activityId: string
+      //   likeActivityId?: string
+      // }
+    }
+
     namespace Todo {
       type Todo = {
         id: number

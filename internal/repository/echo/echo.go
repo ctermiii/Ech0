@@ -15,12 +15,12 @@ import (
 )
 
 type EchoRepository struct {
-	db    *gorm.DB
+	db    func() *gorm.DB
 	cache cache.ICache[string, any]
 }
 
-func NewEchoRepository(db *gorm.DB, cache cache.ICache[string, any]) EchoRepositoryInterface {
-	return &EchoRepository{db: db, cache: cache}
+func NewEchoRepository(dbProvider func() *gorm.DB, cache cache.ICache[string, any]) EchoRepositoryInterface {
+	return &EchoRepository{db: dbProvider, cache: cache}
 }
 
 // getDB 从上下文中获取事务
@@ -28,7 +28,7 @@ func (echoRepository *EchoRepository) getDB(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return echoRepository.db
+	return echoRepository.db()
 }
 
 // CreateEcho 创建新的 Echo
@@ -70,7 +70,7 @@ func (echoRepository *EchoRepository) GetEchosByPage(page, pageSize int, search 
 	var echos []model.Echo
 	var total int64
 
-	query := echoRepository.db.Model(&model.Echo{})
+	query := echoRepository.db().Model(&model.Echo{})
 
 	// 如果 search 不为空，添加模糊查询条件
 	if search != "" {
@@ -116,7 +116,7 @@ func (echoRepository *EchoRepository) GetEchosById(id uint) (*model.Echo, error)
 	// 缓存未命中，查询数据库
 	// 使用 Preload 预加载关联的 Images
 	var echo model.Echo
-	result := echoRepository.db.Preload("Images").First(&echo, id)
+	result := echoRepository.db().Preload("Images").First(&echo, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // 如果未找到记录，则返回 nil
@@ -173,7 +173,7 @@ func (echoRepository *EchoRepository) GetTodayEchos(showPrivate bool) []model.Ec
 	startOfDay := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, today.Location())
 	endOfDay := startOfDay.Add(24 * time.Hour)
 
-	query := echoRepository.db.Model(&model.Echo{})
+	query := echoRepository.db().Model(&model.Echo{})
 	// 如果不是管理员，过滤私密Echo
 	if !showPrivate {
 		query = query.Where("private = ?", false)
@@ -204,7 +204,7 @@ func (echoRepository *EchoRepository) UpdateEcho(ctx context.Context, echo *mode
 	echoRepository.cache.Delete(GetTodayEchosCacheKey(false)) // 删除今天的 Echo 缓存（非管理员视图）
 
 	// 开启事务确保数据一致性
-	tx := echoRepository.db.Begin()
+	tx := echoRepository.db().Begin()
 	if tx.Error != nil {
 		return tx.Error
 	}

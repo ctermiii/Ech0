@@ -2,18 +2,19 @@ package repository
 
 import (
 	"context"
+
 	model "github.com/lin-snow/ech0/internal/model/connect"
 	"github.com/lin-snow/ech0/internal/transaction"
 	"gorm.io/gorm"
 )
 
 type ConnectRepository struct {
-	db *gorm.DB
+	db func() *gorm.DB
 }
 
-func NewConnectRepository(db *gorm.DB) ConnectRepositoryInterface {
+func NewConnectRepository(dbProvider func() *gorm.DB) ConnectRepositoryInterface {
 	return &ConnectRepository{
-		db: db,
+		db: dbProvider,
 	}
 }
 
@@ -22,14 +23,14 @@ func (connectRepository *ConnectRepository) getDB(ctx context.Context) *gorm.DB 
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return connectRepository.db
+	return connectRepository.db()
 }
 
 // GetAllConnects 获取所有连接
 func (connectRepository *ConnectRepository) GetAllConnects() ([]model.Connected, error) {
 	var connects []model.Connected
 	// 查询数据库
-	if err := connectRepository.db.Find(&connects).Error; err != nil {
+	if err := connectRepository.db().Find(&connects).Error; err != nil {
 		return nil, err
 	}
 	// 如果没有找到，返回空切片

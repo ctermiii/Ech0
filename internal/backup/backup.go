@@ -3,9 +3,12 @@ package backup
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
 
+	"github.com/lin-snow/ech0/internal/database"
 	fileUtil "github.com/lin-snow/ech0/internal/util/file"
+	logUtil "github.com/lin-snow/ech0/internal/util/log"
 )
 
 const (
@@ -34,8 +37,62 @@ func ExecuteRestore(backupFilePath string) error {
 		return errors.New("备份文件不存在: " + backupFilePath)
 	}
 
+	previousLock := database.IsWriteLocked()
+	if !previousLock {
+		database.EnableWriteLock()
+		defer database.DisableWriteLock()
+	}
+
+	logUtil.CloseLogger()
+	defer logUtil.ReopenLogger()
+
 	// 解压备份文件到数据目录
 	if err := fileUtil.UnzipFile(backupFilePath, dataDir); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ExcuteRestoreOnline 在线恢复备份
+func ExcuteRestoreOnline(filePath string, timeStamp int64) error {
+	// 检查备份文件是否存在
+	if !fileUtil.FileExists(filePath) {
+		return errors.New("备份文件不存在: " + filePath)
+	}
+
+	// 启用写锁，阻止新的写操作
+	previousLock := database.IsWriteLocked()
+	if !previousLock {
+		database.EnableWriteLock()
+		defer database.DisableWriteLock()
+	}
+
+	// 关闭 Logger，释放文件句柄
+	logUtil.CloseLogger()
+	defer logUtil.ReopenLogger()
+
+	// 解压备份文件到数据目录 （./temp/snapshot_时间戳）
+	extractPath := fmt.Sprintf("temp/snapshot_%d", timeStamp)
+	if err := fileUtil.UnzipFile(filePath, extractPath); err != nil {
+		return err
+	}
+
+	tempDbPath := filepath.Join(extractPath, "ech0.db")
+
+	// 热切换到临时数据库
+	if err := database.HotChangeDatabase(tempDbPath); err != nil {
+		return err
+	}
+
+	// 复制备份覆盖到正式数据目录
+	dataPath := "data"
+	if err := fileUtil.CopyDirectory(extractPath, dataPath); err != nil {
+		return err
+	}
+
+	// 热切换回正式数据库
+	if err := database.HotChangeDatabase("data/ech0.db"); err != nil {
 		return err
 	}
 

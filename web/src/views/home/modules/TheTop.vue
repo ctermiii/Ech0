@@ -17,14 +17,19 @@
           <Rss class="w-8 h-8 text-gray-400" />
         </a>
       </div>
-      <!-- ConnectPage -->
-      <div class="relative mr-2 xl:hidden">
-        <RouterLink to="/connect" title="连接">
+      <!-- Fediverse -->
+      <div class="relative mr-1">
+        <RouterLink to="/fediverse" title="联邦宇宙">
           <!-- icon -->
           <Other class="w-8 h-8 text-gray-400" />
         </RouterLink>
-        <!-- <span class="absolute -top-1 -right-1 block w-2 h-2 bg-green-500 rounded-full ring-1 ring-white"></span> -->
       </div>
+      <!-- ConnectPage -->
+      <!-- <div class="relative mr-2 xl:hidden">
+        <RouterLink to="/connect" title="连接">
+          <Other class="w-8 h-8 text-gray-400" />
+        </RouterLink>
+      </div> -->
       <!-- PanelPage -->
       <div class="relative mr-1">
         <RouterLink to="/panel" title="面板">
@@ -64,8 +69,4 @@ const handleSearch = () => {
     getEchosByPage()
   }
 }
-
-// const notDeveloper = () => {
-//   theToast.info('该功能正在开发中，请耐心等待！')
-// }
 </script>

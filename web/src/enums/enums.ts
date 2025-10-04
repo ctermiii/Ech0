@@ -48,3 +48,11 @@ export enum S3Provider {
   MINIO = 'minio',
   OTHER = 'other', // 其它默认按照 MINIO 处理
 }
+
+// Follow Status
+export enum FollowStatus {
+  NONE = 'none',
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+}

@@ -17,9 +17,9 @@
 
 </div>
 
-> Open-source, self-hosted, lightweight platform for idea sharing
+> A next-generation open-source, self-hosted, lightweight federated publishing platform focused on personal idea sharing.
 
-Ech0 is an open-source, self-hosted platform designed for lightweight sharing, allowing you to quickly post and share your thoughts, writings, and links. With a simple and intuitive interface, managing your content becomes effortless, giving you full control over your data while staying connected to the world anytime, anywhere.
+Ech0 is a new-generation open-source self-hosted platform designed for individual users. It is ultra-lightweight and low-cost, supporting the ActivityPub protocol to let you easily publish and share ideas, writings, and links. With a clean, intuitive interface and powerful command-line tools, content management becomes simple and flexible. Your data is fully owned and controlled by you, always connected to the world, building your own network of thoughts.
 
 ![Interface Preview](./docs/imgs/screenshot_mockup.png)
 
@@ -61,7 +61,7 @@ Ech0 is an open-source, self-hosted platform designed for lightweight sharing, a
 - 📟 **TUI Friendly** — Terminal-friendly interactive interface to manage Ech0 from the TUI.
 - ✍️ **Distraction-Free Writing** — Clean online Markdown editor with rich plugin support and live preview.
 - 📦 **Data Ownership** — All content stored locally in SQLite, with RSS feed support.
-- 🔐 **Secure Backup** — One-click export/backup via Web, TUI, or CLI.
+- 🔐 **Secure Backup** — One-click export/backup/import via Web, TUI, or CLI.
 - ♻️ **Seamless Restore** — Restore any backup via TUI or CLI to ensure data safety.
 - 🎉 **Completely Free** — Open-source under AGPL-3.0 with no tracking, subscription, or dependency.
 - 🌍 **Cross-Device Compatible** — Fully responsive on desktop, tablet, and mobile.
@@ -174,8 +174,8 @@ ssh -p 6278 ssh.vaaat.com
 3. **Is Ech0 free?**  
    Yes, fully free and open-source under AGPL-3.0, no ads, tracking, subscription, or service dependency.  
 
-4. **How to backup and restore?**  
-   Backup `/opt/ech0/data` (mapped directory). Restore by replacing files.  
+4. **How do I back up and restore data?**  
+  Since all content is stored in a local SQLite file, you only need to back up the files in the `/opt/ech0/data` directory (or the mapped path you chose during deployment). To restore, simply replace the data files with your backup. You can also use the online data management features in the settings under "Data Management" to quickly create, export, or restore snapshots. If the latest content does not appear after restoring, try manually restarting the Docker container.
 
 5. **Does Ech0 support RSS?**  
    Yes, content updates can be subscribed via RSS.  
@@ -203,6 +203,9 @@ ssh -p 6278 ssh.vaaat.com
 
 13. **How to configure S3?**  
     Fill in endpoint (without http/https) and bucket with public access.
+
+14. **How to join the Fediverse?**  
+  You need to bind Ech0 to a domain name and fill in the domain in the server address field in the settings page. Once set, Ech0 will automatically join the Fediverse. Example: `https://memo.vaaat.com`
 
 ---
 

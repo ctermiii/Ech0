@@ -10,13 +10,13 @@ import (
 )
 
 type TodoRepository struct {
-	db    *gorm.DB
+	db    func() *gorm.DB
 	cache cache.ICache[string, any]
 }
 
-func NewTodoRepository(db *gorm.DB, cache cache.ICache[string, any]) TodoRepositoryInterface {
+func NewTodoRepository(dbProvider func() *gorm.DB, cache cache.ICache[string, any]) TodoRepositoryInterface {
 	return &TodoRepository{
-		db:    db,
+		db:    dbProvider,
 		cache: cache,
 	}
 }
@@ -26,14 +26,14 @@ func (todoRepository *TodoRepository) getDB(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return todoRepository.db
+	return todoRepository.db()
 }
 
 // GetTodosByUserID 根据用户ID获取待办事项
 func (todoRepository *TodoRepository) GetTodosByUserID(userid uint) ([]model.Todo, error) {
 	var todos []model.Todo
 	// 查询数据库(按创建时间，最新的在前)
-	if err := todoRepository.db.Where("user_id = ?", userid).Order("created_at DESC").Find(&todos).Error; err != nil {
+	if err := todoRepository.db().Where("user_id = ?", userid).Order("created_at DESC").Find(&todos).Error; err != nil {
 		return nil, err
 	}
 	// 如果没有找到，返回空切片
@@ -58,7 +58,7 @@ func (todoRepository *TodoRepository) CreateTodo(ctx context.Context, todo *mode
 func (todoRepository *TodoRepository) GetTodoByID(todoID int64) (*model.Todo, error) {
 	var todo model.Todo
 	// 根据 ID 查找 To do
-	if err := todoRepository.db.Where("id = ?", todoID).First(&todo).Error; err != nil {
+	if err := todoRepository.db().Where("id = ?", todoID).First(&todo).Error; err != nil {
 		return nil, err
 	}
 

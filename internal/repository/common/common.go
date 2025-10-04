@@ -11,12 +11,12 @@ import (
 )
 
 type CommonRepository struct {
-	db *gorm.DB
+	db func() *gorm.DB
 }
 
-func NewCommonRepository(db *gorm.DB) CommonRepositoryInterface {
+func NewCommonRepository(dbProvider func() *gorm.DB) CommonRepositoryInterface {
 	return &CommonRepository{
-		db: db,
+		db: dbProvider,
 	}
 }
 
@@ -25,13 +25,13 @@ func (commonRepository *CommonRepository) getDB(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(transaction.TxKey).(*gorm.DB); ok {
 		return tx
 	}
-	return commonRepository.db
+	return commonRepository.db()
 }
 
 // GetUserByUserId 根据用户ID获取用户信息
 func (commonRepository *CommonRepository) GetUserByUserId(userId uint) (userModel.User, error) {
 	var user userModel.User
-	if err := commonRepository.db.First(&user, userId).Error; err != nil {
+	if err := commonRepository.db().First(&user, userId).Error; err != nil {
 		return user, err
 	}
 	return user, nil
@@ -41,7 +41,7 @@ func (commonRepository *CommonRepository) GetUserByUserId(userId uint) (userMode
 func (commonRepository *CommonRepository) GetSysAdmin() (userModel.User, error) {
 	// 获取系统管理员（首个注册的用户）
 	user := userModel.User{}
-	err := commonRepository.db.Where("is_admin = ?", true).First(&user).Error
+	err := commonRepository.db().Where("is_admin = ?", true).First(&user).Error
 	if err != nil {
 		return userModel.User{}, err
 	}
@@ -52,7 +52,7 @@ func (commonRepository *CommonRepository) GetSysAdmin() (userModel.User, error) 
 // GetAllUsers 获取所有用户信息
 func (commonRepository *CommonRepository) GetAllUsers() ([]userModel.User, error) {
 	var users []userModel.User
-	err := commonRepository.db.Find(&users).Error
+	err := commonRepository.db().Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +65,11 @@ func (commonRepository *CommonRepository) GetAllEchos(showPrivate bool) ([]echoM
 
 	// 是否将私密内容也查询出来
 	if showPrivate {
-		if err := commonRepository.db.Preload("Images").Order("created_at DESC").Find(&echos).Error; err != nil {
+		if err := commonRepository.db().Preload("Images").Order("created_at DESC").Find(&echos).Error; err != nil {
 			return nil, err
 		}
 	} else {
-		if err := commonRepository.db.Preload("Images").Where("private = ?", false).Find(&echos).Error; err != nil {
+		if err := commonRepository.db().Preload("Images").Where("private = ?", false).Find(&echos).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -83,7 +83,7 @@ func (commonRepository *CommonRepository) GetHeatMap(startDate, endDate string) 
 
 	// 查询数据
 	// 执行查询
-	err := commonRepository.db.Table("echos").
+	err := commonRepository.db().Table("echos").
 		Select("DATE(created_at) as date, COUNT(*) as count").
 		Where("DATE(created_at) >= ? AND DATE(created_at) <= ?", startDate, endDate).
 		Group("DATE(created_at)").
@@ -120,7 +120,7 @@ func (commonRepository *CommonRepository) DeleteTempFileByObjectKey(ctx context.
 // GetAllTempFiles 获取所有未删除的临时文件
 func (commonRepository *CommonRepository) GetAllTempFiles() ([]commonModel.TempFile, error) {
 	var files []commonModel.TempFile
-	err := commonRepository.db.Where("deleted = ?", false).Find(&files).Error
+	err := commonRepository.db().Where("deleted = ?", false).Find(&files).Error
 	if err != nil {
 		return nil, err
 	}

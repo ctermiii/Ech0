@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	model "github.com/lin-snow/ech0/internal/model/common"
+	echoModel "github.com/lin-snow/ech0/internal/model/echo"
 	settingModel "github.com/lin-snow/ech0/internal/model/setting"
 	userModel "github.com/lin-snow/ech0/internal/model/user"
 	storageUtil "github.com/lin-snow/ech0/internal/util/storage"
@@ -58,4 +59,7 @@ type CommonServiceInterface interface {
 
 	// CleanupTempFiles 清理过期的临时文件
 	CleanupTempFiles() error
+
+	// RefreshEchoImageURL 刷新 Echo 中的图片 URL
+	RefreshEchoImageURL(echo *echoModel.Echo)
 }

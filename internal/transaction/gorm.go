@@ -8,12 +8,12 @@ import (
 
 // GormTransactionManager 实现了 TransactionManager 接口，使用 GORM 进行事务管理
 type GormTransactionManager struct {
-	db *gorm.DB
+	dbProvider func() *gorm.DB
 }
 
-func NewGormTransactionManager(db *gorm.DB) *GormTransactionManager {
+func NewGormTransactionManager(dbProvider func() *gorm.DB) *GormTransactionManager {
 	return &GormTransactionManager{
-		db: db,
+		dbProvider: dbProvider,
 	}
 }
 
@@ -29,7 +29,7 @@ func NewGormTransactionManager(db *gorm.DB) *GormTransactionManager {
 func (tm *GormTransactionManager) Run(fn func(ctx context.Context) error) error {
 	// 返回一个新的事务上下文
 	// 在这个上下文中，txKey 被设置为当前事务的 gorm.DB，使用gorm自带的自动事务管理
-	return tm.db.Transaction(func(tx *gorm.DB) error {
+	return tm.dbProvider().Transaction(func(tx *gorm.DB) error {
 		// 将当前事务的 gorm.DB 设置到上下文中，这里创建一个新的上下文
 		ctx := context.WithValue(context.Background(), TxKey, tx)
 

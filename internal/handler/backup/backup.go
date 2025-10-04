@@ -90,3 +90,41 @@ func (backupHandler *BackupHandler) ExportBackup() gin.HandlerFunc {
 		}
 	})
 }
+
+// ImportBackup 恢复数据备份
+//
+// @Summary 恢复数据备份
+// @Description 用户上传备份文件，成功后恢复数据
+// @Tags 系统备份
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "备份文件"
+// @Success 200 {object} res.Response "导入备份成功"
+// @Failure 200 {object} res.Response "导入备份失败"
+// @Router /backup/import [post]
+func (backupHandler *BackupHandler) ImportBackup() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		// 提取userid
+		userId := ctx.MustGet("userid").(uint)
+
+		// 提取上传的 File数据
+		file, err := ctx.FormFile("file")
+		if err != nil {
+			return res.Response{
+				Msg: commonModel.INVALID_REQUEST_BODY,
+				Err: err,
+			}
+		}
+
+		if err := backupHandler.backupService.ImportBackup(ctx, userId, file); err != nil {
+			return res.Response{
+				Msg: "",
+				Err: err,
+			}
+		}
+
+		return res.Response{
+			Msg: commonModel.IMPORT_BACKUP_SUCCESS,
+		}
+	})
+}

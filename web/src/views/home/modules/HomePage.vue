@@ -13,12 +13,13 @@
     </div>
     <div class="hidden xl:block sm:max-w-sm w-full px-6 h-screen">
       <TheHeatMap class="mb-2" />
-      <div v-if="isLogin && todos.length > 0" class="mb-2 px-11">
+      <TheStatusCard class="mb-2" />
+      <div v-if="isLogin" class="mb-2 px-11">
         <TheTodoCard :todo="todos[0]" :index="0" :operative="false" @refresh="getTodos" />
       </div>
-      <div class="px-11">
+      <!-- <div class="px-11">
         <TheAudioCard ref="theAudioCard" />
-      </div>
+      </div> -->
       <TheConnects />
     </div>
 
@@ -39,6 +40,7 @@ import TheEchos from './TheEchos.vue'
 import TheTodos from './TheTodos.vue'
 import TheConnects from '@/views/connect/modules/TheConnects.vue'
 import TheTodoCard from '@/components/advanced/TheTodoCard.vue'
+import TheStatusCard from '@/components/advanced/TheStatusCard.vue'
 import TheHeatMap from '@/components/advanced/TheHeatMap.vue'
 import TheBackTop from '@/components/advanced/TheBackTop.vue'
 import { onMounted, ref, onBeforeUnmount } from 'vue'

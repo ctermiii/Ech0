@@ -35,24 +35,24 @@ import (
 type CommonService struct {
 	txManager          transaction.TransactionManager
 	commonRepository   repository.CommonRepositoryInterface
-	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface
 	objStorage         storageUtil.ObjectStorage
 	echoRepository     echoRepository.EchoRepositoryInterface
+	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface
 	eventBus           event.IEventBus
 }
 
 func NewCommonService(
 	tm transaction.TransactionManager,
 	commonRepository repository.CommonRepositoryInterface,
-	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface,
 	echoRepository echoRepository.EchoRepositoryInterface,
+	keyvalueRepository keyvalueRepository.KeyValueRepositoryInterface,
 	eventBusProvider func() event.IEventBus,
 ) CommonServiceInterface {
 	return &CommonService{
 		txManager:          tm,
 		commonRepository:   commonRepository,
-		keyvalueRepository: keyvalueRepository,
 		echoRepository:     echoRepository,
+		keyvalueRepository: keyvalueRepository,
 		objStorage:         nil,
 		eventBus:           eventBusProvider(),
 	}

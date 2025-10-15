@@ -26,15 +26,15 @@ func (fediverseService *FediverseService) HandleInbox(username string, activity 
 			return err
 		}
 	// 处理接收到的推文推送
-	case model.ActivityTypeCreate:
-		if err := fediverseService.handleCreateActivity(&user, activity); err != nil {
-			return err
-		}
+	// case model.ActivityTypeCreate:
+	// 	if err := fediverseService.handleCreateActivity(&user, activity); err != nil {
+	// 		return err
+	// 	}
 	// 处理接收到的接受关注请求
-	case model.ActivityTypeAccept:
-		if err := fediverseService.handleAcceptActivity(&user, activity); err != nil {
-			return err
-		}
+	// case model.ActivityTypeAccept:
+	// 	if err := fediverseService.handleAcceptActivity(&user, activity); err != nil {
+	// 		return err
+	// 	}
 
 	default:
 		return errors.New("Unsupported activity type: " + cases.Title(language.English).String(activity.Type))

@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/fediverse"
 	service "github.com/lin-snow/ech0/internal/service/fediverse"
 )
@@ -142,7 +141,7 @@ func (h *FediverseHandler) GetOutbox(ctx *gin.Context) {
 	// 检查是否带有查询参数
 	if pageStr == "" {
 		// 不带查询参数，返回 Outbox 元信息
-		outbox, err := h.service.BuildOutbox(username)
+		outbox, err := h.service.HandleOutbox(username)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, model.ActivityPubError{
 				Context: "https://www.w3.org/ns/activitystreams",
@@ -362,135 +361,135 @@ func (h *FediverseHandler) GetObject(ctx *gin.Context) {
 }
 
 // GetFollowStatus 获取关注状态
-func (h *FediverseHandler) GetFollowStatus(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
-	targetActor := strings.TrimSpace(ctx.Query("actor"))
-	if targetActor == "" {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](commonModel.FEDIVERSE_INVALID_INPUT))
-		return
-	}
+// func (h *FediverseHandler) GetFollowStatus(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
+// 	targetActor := strings.TrimSpace(ctx.Query("actor"))
+// 	if targetActor == "" {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](commonModel.FEDIVERSE_INVALID_INPUT))
+// 		return
+// 	}
 
-	followStatus, err := h.service.GetFollowStatus(userID, targetActor)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](err.Error()))
-		return
-	}
+// 	followStatus, err := h.service.GetFollowStatus(userID, targetActor)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(followStatus, commonModel.FEDIVERSE_GET_FOLLOW_STATUS_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(followStatus, commonModel.FEDIVERSE_GET_FOLLOW_STATUS_SUCCESS))
+// }
 
 // GetTimeline 获取关注的 Actor 的推文
-func (h *FediverseHandler) GetTimeline(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
+// func (h *FediverseHandler) GetTimeline(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
 
-	page := 1
-	if pageParam := strings.TrimSpace(ctx.Query("page")); pageParam != "" {
-		if parsed, err := strconv.Atoi(pageParam); err == nil && parsed > 0 {
-			page = parsed
-		}
-	}
+// 	page := 1
+// 	if pageParam := strings.TrimSpace(ctx.Query("page")); pageParam != "" {
+// 		if parsed, err := strconv.Atoi(pageParam); err == nil && parsed > 0 {
+// 			page = parsed
+// 		}
+// 	}
 
-	pageSize := 20
-	if pageSizeParam := strings.TrimSpace(ctx.Query("pageSize")); pageSizeParam != "" {
-		if parsed, err := strconv.Atoi(pageSizeParam); err == nil && parsed > 0 {
-			pageSize = parsed
-		}
-	}
+// 	pageSize := 20
+// 	if pageSizeParam := strings.TrimSpace(ctx.Query("pageSize")); pageSizeParam != "" {
+// 		if parsed, err := strconv.Atoi(pageSizeParam); err == nil && parsed > 0 {
+// 			pageSize = parsed
+// 		}
+// 	}
 
-	timeline, err := h.service.GetTimeline(userID, page, pageSize)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[commonModel.PageQueryResult[[]model.TimelineItem]](err.Error()))
-		return
-	}
+// 	timeline, err := h.service.GetTimeline(userID, page, pageSize)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[commonModel.PageQueryResult[[]model.TimelineItem]](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(timeline, commonModel.FEDIVERSE_GET_TIMELINE_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(timeline, commonModel.FEDIVERSE_GET_TIMELINE_SUCCESS))
+// }
 
 // SearchActorByActorID 根据 Actor URL 搜索远端 Actor
-func (h *FediverseHandler) SearchActorByActorID(ctx *gin.Context) {
-	actorID := strings.TrimSpace(ctx.Query("actor"))
-	if actorID == "" {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](commonModel.FEDIVERSE_INVALID_INPUT))
-		return
-	}
+// func (h *FediverseHandler) SearchActorByActorID(ctx *gin.Context) {
+// 	actorID := strings.TrimSpace(ctx.Query("actor"))
+// 	if actorID == "" {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](commonModel.FEDIVERSE_INVALID_INPUT))
+// 		return
+// 	}
 
-	actor, err := h.service.SearchActorByActorID(actorID)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](err.Error()))
-		return
-	}
+// 	actor, err := h.service.SearchActorByActorID(actorID)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]any](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(actor, commonModel.FEDIVERSE_SEARCH_ACTOR_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(actor, commonModel.FEDIVERSE_SEARCH_ACTOR_SUCCESS))
+// }
 
 // PostFollow 发起关注请求
-func (h *FediverseHandler) PostFollow(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
-	var req model.FollowActionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
-		return
-	}
+// func (h *FediverseHandler) PostFollow(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
+// 	var req model.FollowActionRequest
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
+// 		return
+// 	}
 
-	result, err := h.service.FollowActor(userID, req)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
-		return
-	}
+// 	result, err := h.service.FollowActor(userID, req)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_FOLLOW_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_FOLLOW_SUCCESS))
+// }
 
 // PostUnfollow 发起取消关注请求
-func (h *FediverseHandler) PostUnfollow(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
-	var req model.FollowActionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
-		return
-	}
+// func (h *FediverseHandler) PostUnfollow(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
+// 	var req model.FollowActionRequest
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
+// 		return
+// 	}
 
-	result, err := h.service.UnfollowActor(userID, req)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
-		return
-	}
+// 	result, err := h.service.UnfollowActor(userID, req)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_UNFOLLOW_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_UNFOLLOW_SUCCESS))
+// }
 
 // PostLike 发起点赞请求
-func (h *FediverseHandler) PostLike(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
-	var req model.LikeActionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
-		return
-	}
+// func (h *FediverseHandler) PostLike(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
+// 	var req model.LikeActionRequest
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
+// 		return
+// 	}
 
-	result, err := h.service.LikeObject(userID, req)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
-		return
-	}
+// 	result, err := h.service.LikeObject(userID, req)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_LIKE_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_LIKE_SUCCESS))
+// }
 
 // PostUndoLike 发起取消点赞请求
-func (h *FediverseHandler) PostUndoLike(ctx *gin.Context) {
-	userID := ctx.MustGet("userid").(uint)
-	var req model.LikeActionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
-		return
-	}
+// func (h *FediverseHandler) PostUndoLike(ctx *gin.Context) {
+// 	userID := ctx.MustGet("userid").(uint)
+// 	var req model.LikeActionRequest
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](commonModel.INVALID_REQUEST_BODY))
+// 		return
+// 	}
 
-	result, err := h.service.UndoLikeObject(userID, req)
-	if err != nil {
-		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
-		return
-	}
+// 	result, err := h.service.UndoLikeObject(userID, req)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusOK, commonModel.Fail[map[string]string](err.Error()))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_UNDO_LIKE_SUCCESS))
-}
+// 	ctx.JSON(http.StatusOK, commonModel.OK(result, commonModel.FEDIVERSE_UNDO_LIKE_SUCCESS))
+// }

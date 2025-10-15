@@ -1,6 +1,9 @@
 package service
 
-import model "github.com/lin-snow/ech0/internal/model/fediverse"
+import (
+	"github.com/lin-snow/ech0/internal/fediverse"
+	model "github.com/lin-snow/ech0/internal/model/fediverse"
+)
 
 // GetObjectByID 通过 ID 获取内容对象
 func (fediverseService *FediverseService) GetObjectByID(id uint) (model.Object, error) {
@@ -15,15 +18,15 @@ func (fediverseService *FediverseService) GetObjectByID(id uint) (model.Object, 
 	if err != nil {
 		return model.Object{}, err
 	}
-	actor, setting, err := fediverseService.BuildActor(&user)
+	actor, setting, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.Object{}, err
 	}
-	serverURL, err := normalizeServerURL(setting.ServerURL)
+	serverURL, err := fediverse.NormalizeServerURL(setting.ServerURL)
 	if err != nil {
 		return model.Object{}, err
 	}
 
 	// 转 Object
-	return fediverseService.ConvertEchoToObject(echo, &actor, serverURL), nil
+	return fediverseService.core.ConvertEchoToObject(echo, &actor, serverURL), nil
 }

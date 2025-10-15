@@ -10,6 +10,7 @@ import (
 	"github.com/google/wire"
 	"github.com/lin-snow/ech0/internal/cache"
 	"github.com/lin-snow/ech0/internal/event"
+	"github.com/lin-snow/ech0/internal/fediverse"
 	handler8 "github.com/lin-snow/ech0/internal/handler/backup"
 	handler4 "github.com/lin-snow/ech0/internal/handler/common"
 	handler7 "github.com/lin-snow/ech0/internal/handler/connect"
@@ -51,16 +52,17 @@ func BuildHandlers(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory,
 	iCache := ProvideCache(cacheFactory)
 	userRepositoryInterface := repository.NewUserRepository(dbProvider, iCache)
 	commonRepositoryInterface := repository2.NewCommonRepository(dbProvider)
-	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
 	echoRepositoryInterface := repository3.NewEchoRepository(dbProvider, iCache)
-	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface, echoRepositoryInterface, ebProvider)
+	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
+	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, echoRepositoryInterface, keyValueRepositoryInterface, ebProvider)
 	settingRepositoryInterface := repository4.NewSettingRepository(dbProvider)
 	webhookRepositoryInterface := repository5.NewWebhookRepository(dbProvider)
 	settingServiceInterface := service2.NewSettingService(transactionManager, commonServiceInterface, keyValueRepositoryInterface, settingRepositoryInterface, webhookRepositoryInterface)
 	userServiceInterface := service3.NewUserService(transactionManager, userRepositoryInterface, settingServiceInterface, ebProvider)
 	userHandler := handler2.NewUserHandler(userServiceInterface)
 	fediverseRepositoryInterface := repository6.NewFediverseRepository(dbProvider)
-	fediverseServiceInterface := service4.NewFediverseService(transactionManager, fediverseRepositoryInterface, userRepositoryInterface, settingServiceInterface, echoRepositoryInterface, commonServiceInterface)
+	fediverseCore := fediverse.NewFediverseCore(fediverseRepositoryInterface, keyValueRepositoryInterface, userRepositoryInterface, echoRepositoryInterface)
+	fediverseServiceInterface := service4.NewFediverseService(fediverseCore, transactionManager, fediverseRepositoryInterface, userRepositoryInterface, echoRepositoryInterface)
 	echoServiceInterface := service5.NewEchoService(transactionManager, commonServiceInterface, echoRepositoryInterface, commonRepositoryInterface, fediverseServiceInterface, ebProvider)
 	echoHandler := handler3.NewEchoHandler(echoServiceInterface)
 	commonHandler := handler4.NewCommonHandler(commonServiceInterface)
@@ -82,21 +84,28 @@ func BuildTasker(dbProvider func() *gorm.DB, cacheFactory *cache.CacheFactory, t
 	transactionManager := ProvideTransactionManager(tmFactory)
 	commonRepositoryInterface := repository2.NewCommonRepository(dbProvider)
 	iCache := ProvideCache(cacheFactory)
-	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
 	echoRepositoryInterface := repository3.NewEchoRepository(dbProvider, iCache)
-	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, keyValueRepositoryInterface, echoRepositoryInterface, ebProvider)
+	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
+	commonServiceInterface := service.NewCommonService(transactionManager, commonRepositoryInterface, echoRepositoryInterface, keyValueRepositoryInterface, ebProvider)
 	queueRepositoryInterface := repository9.NewQueueRepository(dbProvider)
 	tasker := task.NewTasker(commonServiceInterface, ebProvider, queueRepositoryInterface)
 	return tasker, nil
 }
 
-func BuildEventRegistrar(dbProvider func() *gorm.DB, ebProvider func() event.IEventBus, tmFactory *transaction.TransactionManagerFactory) (*event.EventRegistrar, error) {
+func BuildEventRegistrar(dbProvider func() *gorm.DB, ebProvider func() event.IEventBus, cacheFactory *cache.CacheFactory, tmFactory *transaction.TransactionManagerFactory) (*event.EventRegistrar, error) {
 	webhookRepositoryInterface := repository5.NewWebhookRepository(dbProvider)
 	queueRepositoryInterface := repository9.NewQueueRepository(dbProvider)
 	transactionManager := ProvideTransactionManager(tmFactory)
 	webhookDispatcher := event.NewWebhookDispatcher(ebProvider, webhookRepositoryInterface, queueRepositoryInterface, transactionManager)
 	deadLetterResolver := event.NewDeadLetterResolver(queueRepositoryInterface, webhookDispatcher)
-	eventHandlers := event.NewEventHandlers(webhookDispatcher, deadLetterResolver)
+	fediverseRepositoryInterface := repository6.NewFediverseRepository(dbProvider)
+	iCache := ProvideCache(cacheFactory)
+	keyValueRepositoryInterface := keyvalue.NewKeyValueRepository(dbProvider, iCache)
+	userRepositoryInterface := repository.NewUserRepository(dbProvider, iCache)
+	echoRepositoryInterface := repository3.NewEchoRepository(dbProvider, iCache)
+	fediverseCore := fediverse.NewFediverseCore(fediverseRepositoryInterface, keyValueRepositoryInterface, userRepositoryInterface, echoRepositoryInterface)
+	fediverseAgent := event.NewFediverseAgent(fediverseCore)
+	eventHandlers := event.NewEventHandlers(webhookDispatcher, deadLetterResolver, fediverseAgent)
 	eventRegistrar := event.NewEventRegistry(ebProvider, eventHandlers)
 	return eventRegistrar, nil
 }
@@ -125,8 +134,11 @@ var EchoSet = wire.NewSet(repository3.NewEchoRepository, service5.NewEchoService
 // CommonSet 包含了构建 CommonHandler 所需的所有 Provider
 var CommonSet = wire.NewSet(repository2.NewCommonRepository, service.NewCommonService, handler4.NewCommonHandler)
 
+// KeyValueSet 包含了构建 KeyValueRepository 所需的所有 Provider
+var KeyValueSet = wire.NewSet(keyvalue.NewKeyValueRepository)
+
 // SettingSet 包含了构建 SettingHandler 所需的所有 Provider
-var SettingSet = wire.NewSet(keyvalue.NewKeyValueRepository, repository4.NewSettingRepository, repository5.NewWebhookRepository, service2.NewSettingService, handler5.NewSettingHandler)
+var SettingSet = wire.NewSet(repository4.NewSettingRepository, service2.NewSettingService, handler5.NewSettingHandler)
 
 // TodoSet 包含了构建 TodoHandler 所需的所有 Provider
 var TodoSet = wire.NewSet(repository7.NewTodoRepository, service6.NewTodoService, handler6.NewTodoHandler)
@@ -146,8 +158,11 @@ var TaskSet = wire.NewSet(task.NewTasker)
 // QueueSet 包含了构建 Queue 所需的所有 Provider
 var QueueSet = wire.NewSet(repository9.NewQueueRepository)
 
+// FediverseCoreSet 包含了构建 FediverseCore 所需的所有 Provider
+var FediverseCoreSet = wire.NewSet(fediverse.NewFediverseCore)
+
 // FediverseSet 包含了构建 Fediverse 所需的所有 Provider
-var FediverseSet = wire.NewSet(repository6.NewFediverseRepository, service4.NewFediverseService, handler9.NewFediverseHandler)
+var FediverseSet = wire.NewSet(repository6.NewFediverseRepository, service4.NewFediverseService, handler9.NewFediverseHandler, event.NewFediverseAgent)
 
 // EventSet 包含了构建 Event 相关所需的所有 Provider
 var EventSet = wire.NewSet(event.NewWebhookDispatcher, event.NewDeadLetterResolver, event.NewEventHandlers, event.NewEventRegistry)

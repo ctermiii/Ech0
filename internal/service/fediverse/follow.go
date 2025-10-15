@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/lin-snow/ech0/internal/fediverse"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/fediverse"
 	userModel "github.com/lin-snow/ech0/internal/model/user"
@@ -27,19 +28,19 @@ func (fediverseService *FediverseService) handleFollowActivity(user *userModel.U
 		return errors.New("follow activity missing actor")
 	}
 
-	actor, setting, err := fediverseService.BuildActor(user)
+	actor, setting, err := fediverseService.core.BuildActor(user)
 	if err != nil {
 		return err
 	}
 	serverURL := httpUtil.TrimURL(setting.ServerURL)
 
-	acceptPayload, err := fediverseService.buildAcceptActivityPayload(&actor, activity, followerActor, serverURL)
+	acceptPayload, err := fediverseService.core.BuildAcceptActivityPayload(&actor, activity, followerActor, serverURL)
 	if err != nil {
 		fmt.Printf("Error building accept activity payload: %v\n", err)
 		return err
 	}
 
-	inboxURL, err := fediverseService.fetchRemoteActorInbox(followerActor)
+	inboxURL, err := fediverseService.core.FetchRemoteActorInbox(followerActor)
 	if err != nil {
 		fmt.Printf("Error fetching follower inbox: %v\n", err)
 		return err
@@ -135,7 +136,7 @@ func (fediverseService *FediverseService) GetFollowersPage(
 	username string,
 	page, pageSize int,
 ) (model.FollowersPage, error) {
-	page, pageSize = normalizePageParams(page, pageSize)
+	page, pageSize = fediverse.NormalizePageParams(page, pageSize)
 
 	actor, followerURLs, err := fediverseService.loadFollowersData(username)
 	if err != nil {
@@ -154,7 +155,7 @@ func (fediverseService *FediverseService) loadFollowersData(username string) (mo
 	}
 
 	// 构建 Actor 对象
-	actor, _, err := fediverseService.BuildActor(&user)
+	actor, _, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.Actor{}, nil, err
 	}
@@ -252,7 +253,7 @@ func (fediverseService *FediverseService) GetFollowingPage(
 	username string,
 	page, pageSize int,
 ) (model.FollowingPage, error) {
-	page, pageSize = normalizePageParams(page, pageSize)
+	page, pageSize = fediverse.NormalizePageParams(page, pageSize)
 
 	actor, followingURLs, err := fediverseService.loadFollowingData(username)
 	if err != nil {
@@ -269,7 +270,7 @@ func (fediverseService *FediverseService) loadFollowingData(username string) (mo
 		return model.Actor{}, nil, errors.New(commonModel.USER_NOTFOUND)
 	}
 
-	actor, _, err := fediverseService.BuildActor(&user)
+	actor, _, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.Actor{}, nil, err
 	}

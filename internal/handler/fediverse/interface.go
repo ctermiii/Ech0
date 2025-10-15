@@ -24,18 +24,18 @@ type FediverseHandlerInterface interface {
 	// GetObject 获取内容对象
 	GetObject(ctx *gin.Context)
 
-	// SearchActorByActorID 根据 Actor URL 搜索远端 Actor
-	SearchActorByActorID(ctx *gin.Context)
+	// // SearchActorByActorID 根据 Actor URL 搜索远端 Actor
+	// SearchActorByActorID(ctx *gin.Context)
 
-	// GetFollowStatus 获取关注状态
-	GetFollowStatus(ctx *gin.Context)
+	// // GetFollowStatus 获取关注状态
+	// GetFollowStatus(ctx *gin.Context)
 
-	// PostFollow 发送关注请求
-	PostFollow(ctx *gin.Context)
+	// // PostFollow 发送关注请求
+	// PostFollow(ctx *gin.Context)
 
-	// Unfollow 取消关注请求
-	PostUnfollow(ctx *gin.Context)
+	// // Unfollow 取消关注请求
+	// PostUnfollow(ctx *gin.Context)
 
-	// GetTimeline 获取关注的Actor的推文
-	GetTimeline(ctx *gin.Context)
+	// // GetTimeline 获取关注的Actor的推文
+	// GetTimeline(ctx *gin.Context)
 }

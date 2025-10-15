@@ -16,7 +16,7 @@ func (fediverseService *FediverseService) GetActorByUsername(username string) (m
 	}
 
 	// 构建 Actor 对象
-	actor, _, err := fediverseService.BuildActor(&user)
+	actor, _, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.Actor{}, err
 	}

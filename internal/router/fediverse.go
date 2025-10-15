@@ -32,20 +32,20 @@ func setupFediverseRoutes(appRouterGroup *AppRouterGroup, h *di.Handlers) {
 	// 前端自用的相关路由
 	//==============
 
-	// Search Actor By Actor ID
-	appRouterGroup.AuthRouterGroup.GET("/search/actor", h.FediverseHandler.SearchActorByActorID)
+	// // Search Actor By Actor ID
+	// appRouterGroup.AuthRouterGroup.GET("/search/actor", h.FediverseHandler.SearchActorByActorID)
 
-	// Get Follow Status (获取关注状态)
-	appRouterGroup.AuthRouterGroup.GET("/follow/status", h.FediverseHandler.GetFollowStatus)
+	// // Get Follow Status (获取关注状态)
+	// appRouterGroup.AuthRouterGroup.GET("/follow/status", h.FediverseHandler.GetFollowStatus)
 
-	// Follow (发起关注请求)
-	appRouterGroup.AuthRouterGroup.POST("/follow", h.FediverseHandler.PostFollow)
+	// // Follow (发起关注请求)
+	// appRouterGroup.AuthRouterGroup.POST("/follow", h.FediverseHandler.PostFollow)
 
-	// Unfollow (取消关注请求)
-	appRouterGroup.AuthRouterGroup.POST("/unfollow", h.FediverseHandler.PostUnfollow)
+	// // Unfollow (取消关注请求)
+	// appRouterGroup.AuthRouterGroup.POST("/unfollow", h.FediverseHandler.PostUnfollow)
 
-	// Get Timeline (获取关注的Actor的推文)
-	appRouterGroup.AuthRouterGroup.GET("/timeline", h.FediverseHandler.GetTimeline)
+	// // Get Timeline (获取关注的Actor的推文)
+	// appRouterGroup.AuthRouterGroup.GET("/timeline", h.FediverseHandler.GetTimeline)
 
 	// List Following (列出当前关注的所有Actor)
 	// appRouterGroup.AuthRouterGroup.GET("/following", h.FediverseHandler.GetFollowingList)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/lin-snow/ech0/internal/fediverse"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
 	model "github.com/lin-snow/ech0/internal/model/fediverse"
 )
@@ -22,11 +23,11 @@ func (fediverseService *FediverseService) HandleOutboxPage(
 	}
 
 	// 获取 Actor和 setting
-	actor, setting, err := fediverseService.BuildActor(&user)
+	actor, setting, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.OutboxPage{}, err
 	}
-	serverURL, err := normalizeServerURL(setting.ServerURL)
+	serverURL, err := fediverse.NormalizeServerURL(setting.ServerURL)
 	if err != nil {
 		return model.OutboxPage{}, err
 	}
@@ -37,10 +38,8 @@ func (fediverseService *FediverseService) HandleOutboxPage(
 	// 转 Avtivity
 	var activities []model.Activity
 	for i := range echosByPage {
-		// 处理图片 URL
-		fediverseService.commonService.RefreshEchoImageURL(&echosByPage[i])
 		// 转换为 Activity
-		activities = append(activities, fediverseService.ConvertEchoToActivity(&echosByPage[i], &actor, serverURL))
+		activities = append(activities, fediverseService.core.ConvertEchoToActivity(&echosByPage[i], &actor, serverURL))
 	}
 
 	// 拼装 OutboxPage
@@ -63,4 +62,12 @@ func (fediverseService *FediverseService) HandleOutboxPage(
 	}
 
 	return outboxPage, nil
+}
+
+func (fediverseService *FediverseService) HandleOutbox(username string) (model.OutboxResponse, error) {
+	outbox, err := fediverseService.HandleOutbox(username)
+	if err != nil {
+		return model.OutboxResponse{}, err
+	}
+	return outbox, nil
 }

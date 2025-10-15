@@ -17,7 +17,7 @@ func (fediverseService *FediverseService) Webfinger(username string) (model.WebF
 	}
 
 	// 构建 Actor 对象
-	actor, setting, err := fediverseService.BuildActor(&user)
+	actor, setting, err := fediverseService.core.BuildActor(&user)
 	if err != nil {
 		return model.WebFingerResponse{}, err
 	}

@@ -201,7 +201,7 @@ const handleShareEcho = (echoId: number) => {
     isShareAnimating.value = false
   }, 250) // 对应 duration-250
 
-  const shareUrl = `${window.location.origin}/echo/${echoId}`
+  const shareUrl = `${window.location.origin}/echo/${echoId}\n ———— 来自 Ech0 分享`
   navigator.clipboard.writeText(shareUrl).then(() => {
     theToast.info('已复制到剪贴板！')
   })

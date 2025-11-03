@@ -58,8 +58,11 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- 路由视图 -->
   <RouterView />
+  <!-- 通知组件 -->
   <Toaster theme="light" position="top-right" :expand="false" richColors />
+  <!-- 全局弹窗对话框 -->
   <BaseDialog ref="dialogRef" :title="title" :description="description" @confirm="handleConfirm" />
 </template>
 

@@ -41,6 +41,7 @@ const injectCustomContent = () => {
 }
 
 onMounted(() => {
+  // 注入自定义CSS 和 JS
   watch(
     () => SystemSetting.value.custom_css || SystemSetting.value.custom_js,
     (newSetting) => {

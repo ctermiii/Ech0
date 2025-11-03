@@ -1,5 +1,7 @@
 import 'virtual:uno.css'
 
+import { initStores } from './stores/store-init'
+
 // Md-Editor Start
 import { config } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
@@ -22,8 +24,6 @@ import 'highlight.js/styles/atom-one-dark.css'
 // >=3.0
 import * as prettier from 'prettier'
 import parserMarkdown from 'prettier/plugins/markdown'
-
-import { initStores } from './stores/store-init'
 
 config({
   editorExtensions: {

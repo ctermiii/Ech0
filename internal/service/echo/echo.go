@@ -314,6 +314,17 @@ func (echoService *EchoService) UpdateEcho(userid uint, echo *model.Echo) error 
 			return err
 		}
 
+		// 处理无效图片的临时文件表，防止被当作孤儿文件删除
+		for i := range echo.Images {
+			// 只有S3图片且有ObjectKey的才处理
+			if echo.Images[i].ImageSource == model.ImageSourceS3 && echo.Images[i].ObjectKey != "" {
+				// 使用外层事务的 ctx 直接调用仓储层方法
+				if err := echoService.commonRepository.DeleteTempFileByObjectKey(ctx, echo.Images[i].ObjectKey); err != nil {
+					return err
+				}
+			}
+		}
+
 		// 更新Echo
 		return echoService.echoRepository.UpdateEcho(ctx, echo)
 	}); err != nil {

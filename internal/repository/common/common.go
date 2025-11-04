@@ -112,9 +112,14 @@ func (commonRepository *CommonRepository) DeleteTempFilePermanently(ctx context.
 	return commonRepository.getDB(ctx).Delete(&commonModel.TempFile{}, id).Error
 }
 
-// DeleteTempFileByObjectKey 根据对象键删除临时文件记录
+// DeleteTempFileByObjectKey 根据对象键删除临时文件记录（有则删除，没有则跳过）
 func (commonRepository *CommonRepository) DeleteTempFileByObjectKey(ctx context.Context, objectKey string) error {
-	return commonRepository.getDB(ctx).Where("object_key = ?", objectKey).Delete(&commonModel.TempFile{}).Error
+	result := commonRepository.getDB(ctx).Where("object_key = ?", objectKey).Delete(&commonModel.TempFile{})
+	if result.Error != nil {
+		return result.Error
+	}
+	// 没有找到记录也不算错误，直接返回 nil
+	return nil
 }
 
 // GetAllTempFiles 获取所有未删除的临时文件

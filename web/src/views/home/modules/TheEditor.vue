@@ -118,6 +118,7 @@ watch(
         imagesToAdd.value = echoToUpdate.value.images.map((img) => ({
           image_url: img.image_url || '',
           image_source: img.image_source || '',
+          object_key: img.object_key || '',
         }))
       } else {
         imagesToAdd.value = []

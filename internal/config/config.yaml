@@ -14,7 +14,7 @@ auth:
     audience: "ech0"
 
 upload:
-  imagemaxsize: 5242880 # 5MB
+  imagemaxsize: 20971520 #  20MB
   audiomaxsize: 20971520 # 20MB
   imagepath: "data/images/"
   audiopath: "data/audios/"

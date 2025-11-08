@@ -7,7 +7,6 @@
       images.length === 1 ? 'grid-cols-1 justify-items-center' : 'grid-cols-2',
     ]"
   >
-    <!-- 原@click="active = idx" -->
     <button
       v-for="(src, idx) in images"
       :key="idx"
@@ -23,23 +22,6 @@
       />
     </button>
   </div>
-
-  <!-- 灯箱层 -->
-  <!-- <Teleport to="body">
-    <transition name="fade">
-      <div
-        v-if="active !== null"
-        class="fixed inset-0 w-screen h-screen bg-black/80 backdrop-blur-[12px] flex justify-center items-center z-[9999] overflow-hidden"
-        @click.self="active = null"
-      >
-        <img
-          :src="getImageUrl(images[active])"
-          class="max-w-[80vw] max-h-[80vh] rounded-md cursor-pointer object-contain shadow-[0_4px_12px_rgba(0,0,0,0.4)] transition ease-in-out duration-200"
-          @click="active = null"
-        />
-      </div>
-    </transition>
-  </Teleport> -->
 </template>
 
 <script setup lang="ts">
@@ -92,16 +74,6 @@ function openFancybox(startIndex: number) {
   })
 }
 
-// function close() {
-//   active.value = null
-// }
-
-// function onKeyDown(e: KeyboardEvent) {
-//   if (e.key === 'Escape' && active.value !== null) {
-//     close()
-//   }
-// }
-
 onMounted(() => {
   // window.addEventListener('keydown', onKeyDown)
   Fancybox.bind('[data-fancybox]', {})
@@ -125,14 +97,4 @@ onBeforeUnmount(() => {
     0 4px 8px rgba(0, 0, 0, 0.02),
     0 8px 16px rgba(0, 0, 0, 0.02);
 }
-
-/* 过渡动画 */
-/* .fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.05s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-} */
 </style>

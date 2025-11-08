@@ -106,15 +106,14 @@ const handleRemoveImage = () => {
           url: imageToDel.url,
           source: imageToDel.source,
           object_key: imageToDel.object_key,
-        }).then((res) => {
-          if (res.code === 1) {
-            // 从数组中删除图片
-            imagesToAdd.value.splice(index, 1)
+        }).then(() => {
+          // 这里不管图片是否远程删除成功都强制删除图片
+          // 从数组中删除图片
+          imagesToAdd.value.splice(index, 1)
 
-            // 如果删除成功且当前处于Echo更新模式，则需要立马执行更新（图片删除操作不可逆，需要立马更新确保后端数据同步）
-            if (isUpdateMode.value && echoToUpdate.value) {
-              editorStore.handleAddOrUpdateEcho(true)
-            }
+          // 如果删除成功且当前处于Echo更新模式，则需要立马执行更新（图片删除操作不可逆，需要立马更新确保后端数据同步）
+          if (isUpdateMode.value && echoToUpdate.value) {
+            editorStore.handleAddOrUpdateEcho(true)
           }
         })
       } else {

@@ -70,15 +70,17 @@ func (backupHandler *BackupHandler) ExportBackup() gin.HandlerFunc {
 		token = strings.Trim(token, `"`) // 去掉可能的双引号
 
 		// 使用 JWT Util进行处理
-		if _, err := jwtUtil.ParseToken(token); err != nil {
+		claims, err := jwtUtil.ParseToken(token);
+		if err != nil {
 			return res.Response{
 				Msg: commonModel.TOKEN_NOT_VALID,
 				Err: err,
 			}
 		}
 
-		// userId := ctx.MustGet("userid").(uint)
-		if err := backupHandler.backupService.ExportBackup(ctx); err != nil {
+		// 从 Claims中提取 UserID
+		userId := uint(claims.Userid)
+		if err := backupHandler.backupService.ExportBackup(ctx, userId); err != nil {
 			return res.Response{
 				Msg: "",
 				Err: err,

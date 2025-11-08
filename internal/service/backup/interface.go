@@ -11,7 +11,7 @@ type BackupServiceInterface interface {
 	Backup(userid uint) error
 
 	// ExportBackup 导出备份
-	ExportBackup(ctx *gin.Context) error
+	ExportBackup(ctx *gin.Context, userid uint) error
 
 	// 恢复备份
 	ImportBackup(ctx *gin.Context, userid uint, file *multipart.FileHeader) error

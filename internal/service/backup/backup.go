@@ -62,11 +62,21 @@ func (backupService *BackupService) Backup(userid uint) error {
 }
 
 // ExportBackup 导出备份
-func (backupService *BackupService) ExportBackup(ctx *gin.Context) error {
+func (backupService *BackupService) ExportBackup(ctx *gin.Context, userid uint) error {
+	// 鉴权
+	user, err := backupService.commonService.CommonGetUserByUserId(userid)
+	if err != nil {
+		return err
+	}
+
+	if !user.IsAdmin {
+		return errors.New(commonModel.NO_PERMISSION_DENIED)
+	}
+
 	// 导出备份
 	// 1. 先备份
 	var backupFilePath string // 备份文件路径
-	var err error
+	
 	backupFilePath, _, err = backup.ExecuteBackup()
 	if err != nil {
 		return err

@@ -331,6 +331,7 @@ Thank you to all the friends who have supported this project! Your contributions
 |        🧑‍💻 [@sseaan](https://github.com/sseaan)        | 2025-7-27  | Ech0 is a great thing🥳                          |
 | 🧑‍💻 [@QYG2297248353](https://github.com/QYG2297248353) | 2025-10-10 | None                                            |
 |    🧑‍💻 [@continue33](https://github.com/continue33)    | 2025-10-23 | Thanks for fixing R2                            |
+|                  🧑‍💻 Anonymous Friend                  | 2025-10-28 | hoochanlon              |
 
 ---
 

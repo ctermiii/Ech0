@@ -70,7 +70,7 @@ func (backupHandler *BackupHandler) ExportBackup() gin.HandlerFunc {
 		token = strings.Trim(token, `"`) // 去掉可能的双引号
 
 		// 使用 JWT Util进行处理
-		claims, err := jwtUtil.ParseToken(token);
+		claims, err := jwtUtil.ParseToken(token)
 		if err != nil {
 			return res.Response{
 				Msg: commonModel.TOKEN_NOT_VALID,

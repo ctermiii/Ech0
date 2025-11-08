@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 
+	"go.uber.org/zap"
+
 	"github.com/lin-snow/ech0/internal/event"
 	authModel "github.com/lin-snow/ech0/internal/model/auth"
 	commonModel "github.com/lin-snow/ech0/internal/model/common"
@@ -16,7 +18,6 @@ import (
 	"github.com/lin-snow/ech0/internal/transaction"
 	httpUtil "github.com/lin-snow/ech0/internal/util/http"
 	logUtil "github.com/lin-snow/ech0/internal/util/log"
-	"go.uber.org/zap"
 )
 
 type EchoService struct {
@@ -323,10 +324,10 @@ func (echoService *EchoService) UpdateEcho(userid uint, echo *model.Echo) error 
 			if echo.Images[i].ImageSource == model.ImageSourceS3 && echo.Images[i].ObjectKey != "" {
 				// 使用外层事务的 ctx 直接调用仓储层方法
 				if err := echoService.commonRepository.DeleteTempFileByObjectKey(ctx, echo.Images[i].ObjectKey); err != nil {
-					logUtil.GetLogger().Error("Failed to process temp file for ObjectKey: " , zap.String("Image ObjectKey", echo.Images[i].ObjectKey))
+					logUtil.GetLogger().Error("Failed to process temp file for ObjectKey: ", zap.String("Image ObjectKey", echo.Images[i].ObjectKey))
 					return err
 				}
-				logUtil.GetLogger().Info("Processed temp file for ObjectKey: " , zap.String("Image ObjectKey", echo.Images[i].ObjectKey))
+				logUtil.GetLogger().Info("Processed temp file for ObjectKey: ", zap.String("Image ObjectKey", echo.Images[i].ObjectKey))
 			}
 		}
 

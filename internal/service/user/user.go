@@ -826,7 +826,7 @@ func fetchCustomUserInfo(setting *settingModel.OAuth2Setting, accessToken string
 		return "", err
 	}
 
-	for _, key := range []string{"id", "sub", "user_id", "uid"} {
+	for _, key := range []string{"id", "sub", "user_id", "uid", "openid"} {
 		if val, ok := userData[key]; ok {
 			if id := fmt.Sprint(val); id != "" && id != "<nil>" {
 				return id, nil

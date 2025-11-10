@@ -11,7 +11,7 @@
           <div
             v-for="(connect, index) in connectsInfo"
             :key="index"
-            class="relative flex flex-col items-center justify-center w-8 h-8 border-2 border-gray-200 shadow-sm rounded-full hover:shadow-md transition duration-200 ease-in-out group"
+            class="relative flex flex-col items-center justify-center w-8 h-8 shrink-0 border-2 border-gray-200 shadow-sm rounded-full hover:shadow-md transition duration-200 ease-in-out group"
           >
             <a :href="connect.server_url" target="_blank">
               <img :src="connect.logo" alt="avatar" class="w-8 h-8 rounded-full object-cover" />

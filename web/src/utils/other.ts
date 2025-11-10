@@ -98,3 +98,17 @@ export async function getImageSize(file: File): Promise<{ width: number; height:
   const bitmap = await createImageBitmap(file)
   return { width: bitmap.width, height: bitmap.height }
 }
+
+// 获取 HubEcho 的图片
+export const getHubImageUrl = (image: App.Api.Ech0.Image, baseurl: string) => {
+  if (image.image_source === ImageSource.LOCAL) {
+    return baseurl + '/api' + String(image.image_url)
+  } else if (image.image_source === ImageSource.URL) {
+    return String(image.image_url)
+  } else if (image.image_source === ImageSource.S3) {
+    return String(image.image_url)
+  } else {
+    // 未知的图片来源，按照本地图片处理
+    return baseurl + '/api' + String(image.image_url)
+  }
+}

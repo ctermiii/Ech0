@@ -9,7 +9,7 @@
         <div class="mb-2">
           <BaseButton
             @click="$router.push('/')"
-            class="text-gray-600 rounded-md !shadow-none !border-none !ring-0 !bg-transparent group"
+            class="text-gray-600 rounded-md shadow-none! border-none! ring-0! bg-transparent! group"
             title="返回首页"
           >
             <Arrow

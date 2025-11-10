@@ -86,14 +86,14 @@ const router = createRouter({
       component: () => import('../views/connect/ConnectView.vue'),
     },
     {
+      path: '/hub',
+      name: 'hub',
+      component: () => import('../views/hub/HubView.vue')
+    },
+    {
       path: '/echo/:echoId',
       name: 'echo',
       component: EchoView,
-    },
-    {
-      path: 'hub',
-      name: 'hub',
-      component: () => import('../views/hub/HubView.vue')
     },
     // {
     //   path: '/fediverse',

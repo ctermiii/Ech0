@@ -2,19 +2,22 @@
   <div class="w-full px-2 pb-4 py-2 mt-4 sm:mt-6 mb-10 mx-auto flex justify-center items-center">
     <!-- Ech0s Hub -->
     <div class="w-full mx-auto px-2">
-      <h1 class="mb-4 text-center text-6xl text-gray-400 font-bold italic">Ech0s Hub</h1>
+      <h1 class="mb-4 text-center text-6xl font-serif text-gray-400 font-bold italic">Ech0 Hub</h1>
 
-      <div v-if="echoList.length > 0" class="space-y-6">
+      <div v-if="echoList.length > 0 && !isPreparing" class="space-y-6">
         <div v-for="echo in echoList" :key="echo.id" class="flex justify-center items-center">
-          <TheEchoDetail :echo="echo" class="max-w-full" />
+          <TheHubEcho :echo="echo" class="max-w-full" />
         </div>
       </div>
+      <div v-else="echoList.length === 0 && !isPreparing && !isLoading" class="my-6">
+        <p class="text-gray-500 text-center">暂无数据，快去添加Connect吧🙃</p>
+      </div>
 
-      <div v-if="isLoading || isPreparing">
+      <div v-if="isLoading || isPreparing" class="my-6">
         <p class="text-gray-500 text-center">Loading...</p>
       </div>
 
-      <div v-if="!hasMore">
+      <div v-if="echoList.length > 0 && !hasMore" class="my-6">
         <p class="text-gray-500 text-center">没有更多数据了🙃</p>
       </div>
     </div>
@@ -31,7 +34,7 @@
 
 <script setup lang="ts">
 import TheBackTop from '@/components/advanced/TheBackTop.vue'
-import TheEchoDetail from '@/components/advanced/TheEchoDetail.vue'
+import TheHubEcho from '@/components/advanced/TheHubEcho.vue'
 import { onMounted, ref, onBeforeUnmount } from 'vue'
 import { useHubStore } from '@/stores/hub'
 import { storeToRefs } from 'pinia'

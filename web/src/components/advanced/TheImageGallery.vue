@@ -15,7 +15,7 @@
       @click="openFancybox(idx)"
     >
       <img
-        :src="getImageUrl(src)"
+        :src="props.baseUrl ? getHubImageUrl(src, props.baseUrl) : getImageUrl(src)"
         alt="`预览图片${idx + 1}`"
         loading="lazy"
         class="echoimg block max-w-full h-auto"
@@ -26,12 +26,13 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount } from 'vue'
-import { getImageUrl } from '@/utils/other'
+import { getImageUrl, getHubImageUrl } from '@/utils/other'
 import { Fancybox } from '@fancyapps/ui'
 import '@fancyapps/ui/dist/fancybox/fancybox.css'
 
 const props = defineProps<{
   images: App.Api.Ech0.Echo['images']
+  baseUrl?: string
 }>()
 
 // const active = ref<number | null>(null)

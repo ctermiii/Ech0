@@ -2,11 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useFetch } from '@vueuse/core'
 import { theToast } from '@/utils/toast'
+import { useConnectStore } from './connect'
 
 export const useHubStore = defineStore('hubStore', () => {
   /**
    * state
    */
+
+  const connectStore = useConnectStore()
 
   // hub
   const hubList = ref<App.Api.Hub.HubList>([])
@@ -29,30 +32,16 @@ export const useHubStore = defineStore('hubStore', () => {
   // 1. 获取hubList
   const getHubList = async () => {
     isPreparing.value = true
-    theToast.info('正在获取Hub列表，请稍候...', {
-      duration: 2000,
-    })
+    await connectStore.getConnect()
 
-    const { error, data } = await useFetch<App.Api.Response<App.Api.Hub.HubList>>(
-      import.meta.env.VITE_HUB_LIST_SOURCE,
-    ).json()
-
-    if (error.value || data.value?.code !== 1) {
-      theToast.error('获取Hub列表失败，请稍后再试。')
-      console.error('获取Hub列表失败:', error.value)
-      return
-    }
-
-    if (data.value) {
-      hubList.value = data.value.data
-      // hubList.value.push('https://memo.vaaat.com')
-    }
+    hubList.value = connectStore.connects
   }
 
   // 2. 根据hubList 获取每个item的info
   const getHubInfoList = async () => {
     if (hubList.value.length === 0) {
-      theToast.error('Hub列表为空，请检查配置或稍后再试。')
+      theToast.info('Hub列表为空，请到设置中添加Connect吧~')
+      isPreparing.value = false
       return
     }
 

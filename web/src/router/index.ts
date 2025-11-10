@@ -88,7 +88,7 @@ const router = createRouter({
     {
       path: '/hub',
       name: 'hub',
-      component: () => import('../views/hub/HubView.vue')
+      component: () => import('../views/hub/HubView.vue'),
     },
     {
       path: '/echo/:echoId',

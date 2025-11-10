@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 pb-4 py-2 mt-4 sm:mt-6 mb-10 mx-auto flex justify-center items-center">
+  <div class="w-full px-2 pb-4 py-2 mt-4 sm:mt-6 mb-10 mx-auto flex justify-center items-center">
     <!-- Ech0s Hub -->
     <div class="mx-auto px-2 text-stone-200 w-full">
       <h1 class="text-4xl md:text-6xl italic font-bold font-serif text-center text-stone-300">

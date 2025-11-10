@@ -421,5 +421,32 @@ declare namespace App {
         System: SystemMetric // 系统监控指标
       }
     }
+
+    namespace Hub {
+      type HubItem = string | { id: number; connect_url: string }
+      type HubList = HubItem[]
+      type HubItemInfo = Connect.Connect
+      type HubInfoList = HubItemInfo[]
+
+      type Echo = {
+        id: number
+        content: string
+        username: string
+        image_url: string
+        image_source: string
+        images: Image[]
+        tags?: Tag[]
+        private: boolean
+        user_id: number
+        extension: string
+        extension_type: string
+        fav_count: number
+        created_at: string
+        createdTs: number
+        server_name: string
+        server_url: string
+        logo: string
+      }
+    }
   }
 }

@@ -90,6 +90,11 @@ const router = createRouter({
       name: 'echo',
       component: EchoView,
     },
+    {
+      path: 'hub',
+      name: 'hub',
+      component: () => import('../views/hub/HubView.vue')
+    },
     // {
     //   path: '/fediverse',
     //   name: 'fediverse',

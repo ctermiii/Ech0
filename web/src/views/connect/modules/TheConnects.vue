@@ -11,10 +11,14 @@
           <div
             v-for="(connect, index) in connectsInfo"
             :key="index"
-            class="relative flex flex-col items-center justify-center w-8 h-8 shrink-0 border-2 border-gray-200 shadow-sm rounded-full hover:shadow-md transition duration-200 ease-in-out group"
+            class="relative flex flex-col items-center justify-center w-8 h-8 min-w-[2rem] min-h-[2rem] flex-none border-2 border-gray-200 shadow-sm rounded-full hover:shadow-md transition duration-200 ease-in-out group"
           >
-            <a :href="connect.server_url" target="_blank">
-              <img :src="connect.logo" alt="avatar" class="w-8 h-8 rounded-full object-cover" />
+            <a :href="connect.server_url" target="_blank" class="block w-full h-full">
+              <img
+                :src="connect.logo"
+                alt="avatar"
+                class="w-full h-full rounded-full object-cover"
+              />
               <!-- 热力圆点 -->
               <span
                 class="absolute top-0 right-0 w-2.5 h-2.5 border-2 border-white rounded-full"

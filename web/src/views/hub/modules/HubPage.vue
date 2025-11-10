@@ -1,20 +1,31 @@
 <template>
-  <div class="w-full px-2 pb-4 py-2 mt-4 sm:mt-6 mb-10 mx-auto flex justify-center items-center">
+  <div class="px-2 pb-4 py-2 mt-4 sm:mt-6 mb-10 mx-auto flex justify-center items-center">
     <!-- Ech0s Hub -->
-    <div class="w-full mx-auto px-2">
-      <h1 class="mb-4 text-center text-6xl font-serif text-gray-400 font-bold italic">Ech0 Hub</h1>
+    <div class="mx-auto px-2 text-stone-200 w-full">
+      <h1 class="text-4xl md:text-6xl italic font-bold font-serif text-center text-stone-300">
+        Ech0 Hub
+      </h1>
+
+      <div class="w-sm mx-auto">
+        <!-- 返回首页 -->
+        <BaseButton @click="router.push('/')" :class="getButtonClasses('', true)" title="返回首页">
+          <Arrow
+            class="w-9 h-9 rotate-180 transition-transform duration-200 group-hover:-translate-x-1"
+          />
+        </BaseButton>
+      </div>
 
       <div v-if="echoList.length > 0 && !isPreparing" class="space-y-6">
         <div v-for="echo in echoList" :key="echo.id" class="flex justify-center items-center">
           <TheHubEcho :echo="echo" class="max-w-full" />
         </div>
       </div>
-      <div v-else="echoList.length === 0 && !isPreparing && !isLoading" class="my-6">
-        <p class="text-gray-500 text-center">暂无数据，快去添加Connect吧🙃</p>
-      </div>
 
       <div v-if="isLoading || isPreparing" class="my-6">
-        <p class="text-gray-500 text-center">Loading...</p>
+        <p class="text-gray-500 text-center">加载中...</p>
+      </div>
+      <div v-else-if="echoList.length === 0 && !isPreparing && !isLoading" class="my-6">
+        <p class="text-gray-500 text-center">暂无数据，快去添加Connect吧🙃</p>
       </div>
 
       <div v-if="echoList.length > 0 && !hasMore" class="my-6">
@@ -33,11 +44,33 @@
 </template>
 
 <script setup lang="ts">
+import BaseButton from '@/components/common/BaseButton.vue'
+import Arrow from '@/components/icons/arrow.vue'
 import TheBackTop from '@/components/advanced/TheBackTop.vue'
 import TheHubEcho from '@/components/advanced/TheHubEcho.vue'
-import { onMounted, ref, onBeforeUnmount } from 'vue'
+import { onMounted, computed, ref, onBeforeUnmount } from 'vue'
 import { useHubStore } from '@/stores/hub'
 import { storeToRefs } from 'pinia'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
+const currentRoute = computed(() => route.name as string)
+
+// 统一的按钮样式计算函数
+const getButtonClasses = (routeName: string, isBackButton = false) => {
+  const baseClasses = isBackButton
+    ? 'text-stone-600 rounded-md transition-all duration-300 border-none !shadow-none !ring-0 hover:opacity-75 p-2 group bg-transparent'
+    : 'flex items-center gap-2 pl-3 py-1 rounded-md transition-all duration-300 border-none !shadow-none !ring-0 justify-start bg-transparent'
+
+  const activeClasses =
+    currentRoute.value === routeName
+      ? 'text-stone-800 bg-orange-200'
+      : 'text-stone-600 hover:opacity-75'
+
+  return `${baseClasses} ${activeClasses}`
+}
 
 const hubStore = useHubStore()
 const { echoList, isLoading, isPreparing, hasMore } = storeToRefs(hubStore)

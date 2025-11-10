@@ -152,7 +152,7 @@ export const useHubStore = defineStore('hubStore', () => {
         return false
       })
 
-      if (!hasMore.value) {
+      if (!hasMore.value && echoList.value.length > 0) {
         theToast.info('没有更多数据了🙃')
       }
 

@@ -34,6 +34,13 @@
             <Rss class="w-8 h-8 text-gray-400" />
           </a>
         </div>
+        <!-- Ech0 Hub -->
+        <div>
+          <RouterLink to="/hub" title="Ech0 Hub">
+            <!-- icon -->
+            <HubIcon class="w-8 h-8 text-gray-400" />
+          </RouterLink>
+        </div>
         <!-- Ech0 Widget -->
         <div class="block xl:hidden">
           <RouterLink to="/Widget" title="Ech0 Widget">
@@ -57,6 +64,7 @@
 import BaseInput from '@/components/common/BaseInput.vue'
 import Panel from '@/components/icons/panel.vue'
 import Rss from '@/components/icons/rss.vue'
+import HubIcon from '@/components/icons/hub.vue'
 import { RouterLink } from 'vue-router'
 import { useEchoStore } from '@/stores/echo'
 import { storeToRefs } from 'pinia'

@@ -49,9 +49,9 @@ const getColSpan = (idx: number, total: number) => {
 function openFancybox(startIndex: number) {
   // 构造 Fancybox 需要的 items 数组
   const items = props.images.map((src) => ({
-    src: getImageUrl(src),
+    src: props.baseUrl ? getHubImageUrl(src, props.baseUrl!) : getImageUrl(src),
     type: 'image' as const,
-    thumb: getImageUrl(src),
+    thumb: props.baseUrl ? getHubImageUrl(src, props.baseUrl!) : getImageUrl(src),
   }))
 
   Fancybox.show(items, {

@@ -48,7 +48,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import Arrow from '@/components/icons/arrow.vue'
 import TheBackTop from '@/components/advanced/TheBackTop.vue'
 import TheHubEcho from '@/components/advanced/TheHubEcho.vue'
-import { onMounted, computed, ref, onBeforeUnmount } from 'vue'
+import { onMounted, watch, computed, ref, onBeforeUnmount, nextTick } from 'vue'
 import { useHubStore } from '@/stores/hub'
 import { storeToRefs } from 'pinia'
 import { useRouter, useRoute } from 'vue-router'
@@ -93,19 +93,41 @@ const updatePosition = () => {
   }
 }
 
-// 判断是否滚动到底部附近，触发加载下一页
+// --- 滚动到底部检测 ---
+let ticking = false
 const onScroll = () => {
-  updateShowBackTop()
+  if (ticking) return
+  ticking = true
+  requestAnimationFrame(() => {
+    updateShowBackTop()
 
-  if (isLoading.value) return // 正在加载时不触发
+    if (isLoading.value || !hasMore.value) {
+      ticking = false
+      return
+    }
 
-  const scrollPosition = window.scrollY + window.innerHeight
-  const threshold = 300 // 距底部300px触发加载
+    const scrollPosition = window.scrollY + window.innerHeight
+    const fullHeight = document.documentElement.scrollHeight
+    const threshold = 300
 
+    if (scrollPosition + threshold >= fullHeight) {
+      hubStore.loadEchoListPage()
+    }
+
+    ticking = false
+  })
+}
+
+// --- 自动加载补全 ---
+const ensureScrollable = async () => {
+  await nextTick()
   const fullHeight = document.documentElement.scrollHeight
+  const windowHeight = window.innerHeight
 
-  if (scrollPosition + threshold >= fullHeight) {
-    hubStore.loadEchoListPage()
+  // 如果内容高度太短，继续加载直到可滚动或无更多数据
+  if (fullHeight <= windowHeight + 10 && hasMore.value && !isLoading.value) {
+    await hubStore.loadEchoListPage()
+    ensureScrollable()
   }
 }
 
@@ -120,6 +142,14 @@ onMounted(async () => {
   await hubStore.getHubList()
   await hubStore.getHubInfoList()
   hubStore.loadEchoListPage()
+
+  // 自动填充内容不足的情况
+  ensureScrollable()
+})
+
+// 当 echoList 变化时，自动检测是否需要补充加载
+watch(echoList, () => {
+  ensureScrollable()
 })
 
 onBeforeUnmount(() => {

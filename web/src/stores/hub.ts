@@ -53,9 +53,9 @@ export const useHubStore = defineStore('hubStore', () => {
           : item
         : item.connect_url.endsWith('/')
           ? {
-              ...item,
-              connect_url: item.connect_url.slice(0, -1),
-            }
+            ...item,
+            connect_url: item.connect_url.slice(0, -1),
+          }
           : item
     })
 

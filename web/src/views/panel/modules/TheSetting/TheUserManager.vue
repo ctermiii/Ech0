@@ -43,7 +43,7 @@
               </td>
               <td class="px-3 py-2 text-right">
                 <button
-                  class="p-1 hover:bg-gray-100 rounded"
+                  class="p-1 hover:bg-[#fff6eb] rounded"
                   @click="handleDeleteUser(user.id)"
                   title="删除用户"
                 >

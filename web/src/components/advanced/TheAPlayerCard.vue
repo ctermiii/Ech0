@@ -63,4 +63,8 @@ const metingAPI = computed(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.aplayer) {
+  border-radius: 5px;
+}
+</style>

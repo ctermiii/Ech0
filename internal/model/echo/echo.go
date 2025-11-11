@@ -8,6 +8,7 @@ type Echo struct {
 	Content       string    `gorm:"type:text;not null"                               json:"content"`
 	Username      string    `gorm:"type:varchar(100)"                                json:"username,omitempty"`
 	Images        []Image   `gorm:"foreignKey:MessageID;constraint:OnDelete:CASCADE" json:"images,omitempty"`
+	Layout        string    `gorm:"type:varchar(50);default:'waterfall'"             json:"layout,omitempty"`
 	Private       bool      `gorm:"default:false"                                    json:"private"`
 	UserID        uint      `gorm:"not null;index"                                   json:"user_id"`
 	Extension     string    `gorm:"type:text"                                        json:"extension,omitempty"`

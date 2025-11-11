@@ -27,23 +27,47 @@
     <!-- 图片 && 内容 -->
     <div>
       <div class="py-4">
-        <TheImageGallery :images="props.echo.images" />
+        <!-- 根据布局决定文字与图片顺序 -->
+        <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
+        <template v-if="props.echo.layout === 'grid' || props.echo.layout === 'horizontal'">
+          <!-- 文字在上 -->
+          <div class="mb-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="previewOptions.theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
 
-        <!-- 内容 -->
-        <div>
-          <MdPreview
-            :id="previewOptions.proviewId"
-            :modelValue="props.echo.content"
-            :theme="previewOptions.theme"
-            :show-code-row-number="previewOptions.showCodeRowNumber"
-            :preview-theme="previewOptions.previewTheme"
-            :code-theme="previewOptions.codeTheme"
-            :code-style-reverse="previewOptions.codeStyleReverse"
-            :no-img-zoom-in="previewOptions.noImgZoomIn"
-            :code-foldable="previewOptions.codeFoldable"
-            :auto-fold-threshold="previewOptions.autoFoldThreshold"
-          />
-        </div>
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+        </template>
+
+        <template v-else>
+          <!-- 图片在上，文字在下 -->
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+
+          <div class="mt-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="previewOptions.theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
+        </template>
 
         <!-- 扩展内容 -->
         <div v-if="props.echo.extension" class="my-4">

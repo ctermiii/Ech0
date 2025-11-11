@@ -6,7 +6,7 @@
         Ech0 Hub
       </h1>
 
-      <div class="w-sm mx-auto">
+      <div class="w-full max-w-sm mx-auto">
         <!-- 返回首页 -->
         <BaseButton @click="router.push('/')" :class="getButtonClasses('', true)" title="返回首页">
           <Arrow
@@ -17,7 +17,7 @@
 
       <div v-if="echoList.length > 0 && !isPreparing" class="space-y-6">
         <div v-for="echo in echoList" :key="echo.id" class="flex justify-center items-center">
-          <TheHubEcho :echo="echo" class="max-w-full" />
+          <TheHubEcho :echo="echo" />
         </div>
       </div>
 

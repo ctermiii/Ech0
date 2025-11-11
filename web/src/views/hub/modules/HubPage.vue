@@ -17,7 +17,7 @@
 
       <div v-if="echoList.length > 0 && !isPreparing" class="space-y-6">
         <div v-for="echo in echoList" :key="echo.id" class="flex justify-center items-center">
-          <TheHubEcho :echo="echo" />
+          <TheHubEcho :echo="echo" class="hover:shadow-md" />
         </div>
       </div>
 

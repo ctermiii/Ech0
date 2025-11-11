@@ -66,5 +66,10 @@ const metingAPI = computed(() => {
 <style scoped>
 :deep(.aplayer) {
   border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(27, 27, 27, 0.075);
+  transition: box-shadow 0.2s;
+}
+:deep(.aplayer):hover {
+  box-shadow: 0 2px 5px rgba(19, 19, 19, 0.075);
 }
 </style>

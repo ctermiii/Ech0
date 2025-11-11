@@ -62,6 +62,7 @@ import Githubproj from '@/components/icons/githubproj.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import Audio from '@/components/icons/audio.vue'
 
+import { theToast } from '@/utils/toast'
 import { Mode, ExtensionType } from '@/enums/enums'
 import { useEditorStore } from '@/stores/editor'
 import { useTodoStore } from '@/stores/todo'
@@ -80,10 +81,12 @@ const handleAddExtension = (extensiontype: ExtensionType) => {
 const handleTodo = () => {
   setTodoMode(true)
   editorStore.currentMode = Mode.TODO
+  theToast.info('已切换到 Todo 模式')
 }
 
 const handlePlayMusic = () => {
   editorStore.setMode(Mode.PlayMusic)
+  theToast.info('已切换到 音乐播放器 模式')
 }
 </script>
 

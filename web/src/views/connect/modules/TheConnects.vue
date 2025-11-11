@@ -7,7 +7,7 @@
       </h2>
       <div v-if="!loading">
         <div v-if="!connectsInfo.length" class="text-stone-400 text-sm mb-2">当前暂无连接</div>
-        <div v-else class="flex flex-wrap gap-4">
+        <div v-else class="flex flex-wrap gap-3">
           <div
             v-for="(connect, index) in connectsInfo"
             :key="index"

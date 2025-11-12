@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { theToast } from '@/utils/toast'
 import { fetchAddEcho, fetchUpdateEcho, fetchAddTodo, fetchGetMusic } from '@/service/api'
-import { Mode, ExtensionType, ImageSource } from '@/enums/enums'
+import { Mode, ExtensionType, ImageSource, ImageLayout } from '@/enums/enums'
 import { useEchoStore } from '@/stores/echo'
 import { useTodoStore } from '@/stores/todo'
 
@@ -35,7 +35,7 @@ export const useEditorStore = defineStore('editorStore', () => {
     content: '', // 文字板块
     images: [], // 图片板块
     private: false, // 是否私密
-  layout: 'waterfall', // 图片布局方式，默认为 waterfall
+    layout: ImageLayout.WATERFALL, // 图片布局方式，默认为 waterfall
     extension: null, // 拓展内容（对于扩展类型所需的数据）
     extension_type: null, // 拓展内容类型（音乐/视频/链接/GITHUB项目）
   })
@@ -101,7 +101,7 @@ export const useEditorStore = defineStore('editorStore', () => {
       content: '',
       images: [],
       private: false,
-      layout: 'waterfall',
+      layout: ImageLayout.WATERFALL,
       extension: null,
       extension_type: null,
       tags: [],
@@ -234,7 +234,7 @@ export const useEditorStore = defineStore('editorStore', () => {
         // 回填 echoToUpdate
         echoStore.echoToUpdate.content = echoToAdd.value.content
         echoStore.echoToUpdate.private = echoToAdd.value.private
-  echoStore.echoToUpdate.layout = echoToAdd.value.layout
+        echoStore.echoToUpdate.layout = echoToAdd.value.layout
         echoStore.echoToUpdate.images = echoToAdd.value.images
         echoStore.echoToUpdate.extension = echoToAdd.value.extension
         echoStore.echoToUpdate.extension_type = echoToAdd.value.extension_type

@@ -54,7 +54,7 @@ import { theToast } from '@/utils/toast'
 import { watch } from 'vue'
 import { useEchoStore } from '@/stores/echo'
 import { storeToRefs } from 'pinia'
-import { Mode, ExtensionType } from '@/enums/enums'
+import { Mode, ExtensionType, ImageLayout } from '@/enums/enums'
 import { useEditorStore } from '@/stores/editor'
 
 /* --------------- 与Pinia相关 ---------------- */
@@ -111,8 +111,6 @@ watch(
 
       // 1. 填充本文
       echoToAdd.value.content = echoToUpdate.value?.content || ''
-  echoToAdd.value.private = echoToUpdate.value?.private || false
-  echoToAdd.value.layout = echoToUpdate.value?.layout || 'waterfall'
 
       // 2. 填充图片
       if (echoToUpdate.value?.images && echoToUpdate.value.images.length > 0) {
@@ -160,10 +158,14 @@ watch(
           ? echoToUpdate.value.tags[0]?.name || ''
           : ''
 
-      // 5. 回到页面顶部（触发BackToTop）
+      // 5. 填充私密状态 && 布局方式
+      echoToAdd.value.private = echoToUpdate.value?.private || false
+      echoToAdd.value.layout = echoToUpdate.value?.layout || ImageLayout.WATERFALL
+
+      // 6. 回到页面顶部（触发BackToTop）
       window.scrollTo({ top: 0, behavior: 'smooth' })
 
-      // 6. 弹出通知，提示可以编辑了
+      // 7. 弹出通知，提示可以编辑了
       theToast.info('已进入更新模式，请编辑内容后点击更新按钮！')
     } else {
       // 退出更新模式

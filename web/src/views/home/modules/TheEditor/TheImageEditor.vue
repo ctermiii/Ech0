@@ -104,8 +104,7 @@
 import { useEditorStore } from '@/stores/editor'
 import { useSettingStore } from '@/stores/setting'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
-import { ImageSource } from '@/enums/enums'
+import { ImageSource, ImageLayout } from '@/enums/enums'
 import Url from '@/components/icons/url.vue'
 import Upload from '@/components/icons/upload.vue'
 import Bucket from '@/components/icons/bucket.vue'
@@ -120,12 +119,12 @@ const { imageToAdd, ImageUploading, echoToAdd } = storeToRefs(editorStore)
 const settingStore = useSettingStore()
 const { S3Setting } = storeToRefs(settingStore)
 
-// 布局选择（绑定到 editorStore.echoToAdd.layout）
+// 布局选择
 const layoutOptions = [
-  { label: '瀑布流', value: 'waterfall' },
-  { label: '九宫格', value: 'grid' },
-  { label: '单图轮播', value: 'carousel' },
-  { label: '水平轮播', value: 'horizontal' },
+  { label: '瀑布流', value: ImageLayout.WATERFALL },
+  { label: '九宫格', value: ImageLayout.GRID },
+  { label: '单图轮播', value: ImageLayout.CAROUSEL },
+  { label: '水平轮播', value: ImageLayout.HORIZONTAL },
 ]
 </script>
 

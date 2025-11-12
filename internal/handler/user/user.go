@@ -607,7 +607,7 @@ func (userHandler *UserHandler) GetOAuthInfo() gin.HandlerFunc {
 		// 获取 provider 参数
 		provider := ctx.Query("provider")
 		switch provider {
-		case string(commonModel.OAuth2GITHUB), string(commonModel.OAuth2GOOGLE), string(commonModel.OAuth2CUSTOM):
+		case string(commonModel.OAuth2GITHUB), string(commonModel.OAuth2GOOGLE), string(commonModel.OAuth2QQ), string(commonModel.OAuth2CUSTOM):
 			// 保持原值
 		default:
 			provider = string(commonModel.OAuth2GITHUB) // 默认使用 GitHub

@@ -24,6 +24,14 @@ export enum ImageSource {
   S3 = 's3',
 }
 
+// 图片布局
+export enum ImageLayout {
+  WATERFALL = 'waterfall', // 瀑布流布局
+  GRID = 'grid',           // 九宫格布局
+  HORIZONTAL = 'horizontal', // 横向布局
+  CAROUSEL = 'carousel',     // 单图轮播布局
+}
+
 // 评论服务提供者
 export enum CommentProvider {
   TWIKOO = 'twikoo',

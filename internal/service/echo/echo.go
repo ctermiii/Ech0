@@ -60,6 +60,16 @@ func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error
 		return errors.New(commonModel.NO_PERMISSION_DENIED)
 	}
 
+	// 检查图片布局
+	layout := strings.TrimSpace(newEcho.Layout)
+	if layout == "" || (
+		layout != model.LayoutWaterfall &&
+		layout != model.LayoutGrid &&
+		layout != model.LayoutHorizontal &&
+		layout != model.LayoutCarousel) {
+		newEcho.Layout = model.LayoutWaterfall
+	}
+
 	// 检查Extension内容
 	if newEcho.Extension != "" && newEcho.ExtensionType != "" {
 		switch newEcho.ExtensionType {
@@ -280,39 +290,49 @@ func (echoService *EchoService) UpdateEcho(userid uint, echo *model.Echo) error 
 		return errors.New(commonModel.NO_PERMISSION_DENIED)
 	}
 
+	// 检查图片布局
+	layout := strings.TrimSpace(echo.Layout)
+	if layout == "" || (
+		layout != model.LayoutWaterfall &&
+		layout != model.LayoutGrid &&
+		layout != model.LayoutHorizontal &&
+		layout != model.LayoutCarousel) {
+		echo.Layout = model.LayoutWaterfall
+	}
+
+	// 检查Extension内容
+	if echo.Extension != "" && echo.ExtensionType != "" {
+		switch echo.ExtensionType {
+		case model.Extension_MUSIC:
+			// 处理音乐链接 (暂无)
+		case model.Extension_VIDEO:
+			// 处理视频链接 (暂无)
+		case model.Extension_GITHUBPROJ:
+			echo.Extension = httpUtil.TrimURL(echo.Extension)
+		case model.Extension_WEBSITE:
+			// 处理网站链接 (暂无)
+		}
+	} else {
+		echo.Extension = ""
+		echo.ExtensionType = ""
+	}
+
+	// 处理无效图片
+	for i := range echo.Images {
+		if echo.Images[i].ImageURL == "" {
+			echo.Images[i].ImageSource = ""
+			echo.Images[i].ImageURL = ""
+		}
+		// 确保外键正确设置
+		echo.Images[i].MessageID = echo.ID
+	}
+
+	// 检查是否为空
+	if echo.Content == "" && len(echo.Images) == 0 && (echo.Extension == "" || echo.ExtensionType == "") {
+		return errors.New(commonModel.ECHO_CAN_NOT_BE_EMPTY)
+	}
+
 	if err := echoService.txManager.Run(func(ctx context.Context) error {
-		// 检查Extension内容
-		if echo.Extension != "" && echo.ExtensionType != "" {
-			switch echo.ExtensionType {
-			case model.Extension_MUSIC:
-				// 处理音乐链接 (暂无)
-			case model.Extension_VIDEO:
-				// 处理视频链接 (暂无)
-			case model.Extension_GITHUBPROJ:
-				echo.Extension = httpUtil.TrimURL(echo.Extension)
-			case model.Extension_WEBSITE:
-				// 处理网站链接 (暂无)
-			}
-		} else {
-			echo.Extension = ""
-			echo.ExtensionType = ""
-		}
-
-		// 处理无效图片
-		for i := range echo.Images {
-			if echo.Images[i].ImageURL == "" {
-				echo.Images[i].ImageSource = ""
-				echo.Images[i].ImageURL = ""
-			}
-			// 确保外键正确设置
-			echo.Images[i].MessageID = echo.ID
-		}
-
-		// 检查是否为空
-		if echo.Content == "" && len(echo.Images) == 0 && (echo.Extension == "" || echo.ExtensionType == "") {
-			return errors.New(commonModel.ECHO_CAN_NOT_BE_EMPTY)
-		}
-
 		// 处理标签
 		if err := echoService.ProcessEchoTags(ctx, echo); err != nil {
 			return err

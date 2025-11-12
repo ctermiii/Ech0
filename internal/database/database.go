@@ -93,6 +93,7 @@ func InitDatabase() {
 		SetDB(SQLiteDB)
 	}
 
+	// 自动建表
 	if err := MigrateDB(); err != nil {
 		util.HandlePanicError(&commonModel.ServerError{
 			Msg: commonModel.MIGRATE_DB_PANIC,
@@ -100,16 +101,13 @@ func InitDatabase() {
 		})
 	}
 
-	// 为旧数据补充默认布局值
-	if err := FixOldEchoLayoutData(); err != nil {
+	// 执行旧数据库迁移和数据修复任务
+	if err := UpdateMigration(); err != nil {
 		util.HandlePanicError(&commonModel.ServerError{
-			Msg: "修复旧数据布局字段失败",
+			Msg: commonModel.MIGRATE_DB_PANIC,
 			Err: err,
 		})
 	}
-
-	// 从 1.x 迁移到 2.x
-	// UpdateMigration() // 目前应该不需要了，不再对远古版本提供支持
 }
 
 // MigrateDB 执行数据库迁移
@@ -184,19 +182,4 @@ func CloseDatabaseFully(db *gorm.DB) error {
 	return errors.New(commonModel.DATABASE_CLOSE_FAILED)
 }
 
-// FixOldEchoLayoutData 为旧数据补充默认的布局值（layout 为 NULL 或空字符串时设为 'waterfall'）
-func FixOldEchoLayoutData() error {
-	db := GetDB()
-	if db == nil {
-		return errors.New("database not initialized")
-	}
 
-	// 更新所有 layout 为 NULL 或空字符串的 echo 记录为 'waterfall'
-	if err := db.Model(&echoModel.Echo{}).
-		Where("layout IS NULL OR layout = ''").
-		Update("layout", "waterfall").Error; err != nil {
-		return err
-	}
-
-	return nil
-}

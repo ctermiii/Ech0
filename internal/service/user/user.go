@@ -507,7 +507,7 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 			return ""
 		}
 
-		qqOpenIDResp, err := fetchQQUserInfo(setting, tokenResp.AccessToken)
+		qqOpenIDResp, err := fetchQQUserInfo(tokenResp.AccessToken)
 		if err != nil {
 			fmt.Printf("Error fetching %s user info: %v\n", provider, err)
 			return ""
@@ -858,7 +858,7 @@ func exchangeQQCodeForToken(setting *settingModel.OAuth2Setting, code string) (*
 }
 
 // fetchQQUserInfo 获取 QQ 用户信息
-func fetchQQUserInfo(setting *settingModel.OAuth2Setting, accessToken string) (*authModel.QQOpenIDResponse, error) {
+func fetchQQUserInfo(accessToken string) (*authModel.QQOpenIDResponse, error) {
 	// 先获取 openid
 	openIDURL := "https://graph.qq.com/oauth2.0/me" + "?access_token=" + url.QueryEscape(accessToken) + "&fmt=json"
 	req, _ := http.NewRequest("GET", openIDURL, nil)

@@ -194,20 +194,24 @@
             <p class="text-stone-500 font-bold flex items-center">
               <component
                 :is="
-                  oauthInfo.provider === 'github'
+                  oauthInfo.provider === OAuth2Provider.GITHUB
                     ? Github
-                    : oauthInfo.provider === 'google'
+                    : oauthInfo.provider === OAuth2Provider.GOOGLE
                       ? Google
-                      : Custom
+                      : oauthInfo.provider === OAuth2Provider.QQ
+                        ? QQ
+                        : Custom
                 "
                 class="w-5 h-5 mr-2"
               />
               <span>{{
-                oauthInfo.provider === 'github'
+                oauthInfo.provider === OAuth2Provider.GITHUB
                   ? 'GitHub'
-                  : oauthInfo.provider === 'google'
+                  : oauthInfo.provider === OAuth2Provider.GOOGLE
                     ? 'Google'
-                    : '自定义 OAuth2 账号'
+                    : oauthInfo.provider === OAuth2Provider.QQ
+                      ? 'QQ'
+                      : '自定义 OAuth2 账号'
               }}</span>
               账号已绑定
             </p>
@@ -220,21 +224,25 @@
             <div class="flex items-center justify-between">
               <component
                 :is="
-                  OAuth2Setting.provider === 'github'
+                  OAuth2Setting.provider === OAuth2Provider.GITHUB
                     ? Github
-                    : OAuth2Setting.provider === 'google'
+                    : OAuth2Setting.provider === OAuth2Provider.GOOGLE
                       ? Google
-                      : Custom
+                      : OAuth2Setting.provider === OAuth2Provider.QQ
+                        ? QQ
+                        : Custom
                 "
                 class="w-5 h-5 mr-2"
               />
               <span class="flex-1 text-left">
                 {{
-                  OAuth2Setting.provider === 'github'
+                  OAuth2Setting.provider === OAuth2Provider.GITHUB
                     ? '绑定 GitHub 账号'
-                    : OAuth2Setting.provider === 'google'
+                    : OAuth2Setting.provider === OAuth2Provider.GOOGLE
                       ? '绑定 Google 账号'
-                      : '绑定自定义 OAuth2 账号'
+                      : OAuth2Setting.provider === OAuth2Provider.QQ
+                        ? '绑定 QQ 账号'
+                        : '绑定自定义 OAuth2 账号'
                 }}
               </span>
             </div>
@@ -261,6 +269,7 @@ import { OAuth2Provider } from '@/enums/enums'
 import { fetchUpdateOAuth2Settings, fetchBindOAuth2, fetchGetOAuthInfo } from '@/service/api'
 import Github from '@/components/icons/github.vue'
 import Google from '@/components/icons/google.vue'
+import QQ from '@/components/icons/qq.vue'
 import Custom from '@/components/icons/customoauth.vue'
 import { storeToRefs } from 'pinia'
 
@@ -273,6 +282,7 @@ const oauth2EditMode = ref(false)
 const OAuth2ProviderOptions = [
   { label: 'GitHub', value: OAuth2Provider.GITHUB },
   { label: 'Google', value: OAuth2Provider.GOOGLE },
+  { label: 'QQ', value: OAuth2Provider.QQ },
   { label: 'Custom', value: OAuth2Provider.CUSTOM },
 ]
 
@@ -349,6 +359,16 @@ function getProviderTemplate(provider: string) {
       token_url: 'https://oauth2.googleapis.com/token',
       user_info_url: 'https://openidconnect.googleapis.com/v1/userinfo',
       scopes: ['openid'], // 只要OAuth ID
+    }
+  } else if (provider === String(OAuth2Provider.QQ)) {
+    scopeString.value = 'get_user_info'
+    redirect_uri.value = `${window.location.origin}/oauth/qq/callback`
+    return {
+      redirect_uri: `${window.location.origin}/oauth/qq/callback`,
+      auth_url: 'https://graph.qq.com/oauth2.0/authorize',
+      token_url: 'https://graph.qq.com/oauth2.0/token',
+      user_info_url: 'https://graph.qq.com/user/get_user_info',
+      scopes: ['get_user_info'],
     }
   } else if (provider === String(OAuth2Provider.CUSTOM)) {
     scopeString.value = ''

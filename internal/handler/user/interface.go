@@ -42,6 +42,15 @@ type UserHandlerInterface interface {
 	// BindGoogle 绑定 Google 账号
 	BindGoogle() gin.HandlerFunc
 
+	// QQLogin 处理 QQ OAuth2 登录请求
+	QQLogin() gin.HandlerFunc
+
+	// QQCallback 处理 QQ OAuth2 回调
+	QQCallback() gin.HandlerFunc
+
+	// BindQQ 绑定 QQ 账号
+	BindQQ() gin.HandlerFunc
+
 	// CustomOAuthLogin 处理自定义 OAuth2 登录请求
 	CustomOAuthLogin() gin.HandlerFunc
 

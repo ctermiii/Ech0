@@ -54,6 +54,7 @@ export enum S3Provider {
 export enum OAuth2Provider {
   GITHUB = 'github',
   GOOGLE = 'google',
+  QQ = 'qq',
   CUSTOM = 'custom',
 }
 

@@ -257,7 +257,6 @@ button:hover .echoimg {
   flex-shrink: 0;
   height: 200px;
   width: auto;
-  /* min-width: 160px; */
   overflow: hidden;
 }
 .scroll-hint {

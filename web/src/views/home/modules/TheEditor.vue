@@ -111,7 +111,8 @@ watch(
 
       // 1. 填充本文
       echoToAdd.value.content = echoToUpdate.value?.content || ''
-      echoToAdd.value.private = echoToUpdate.value?.private || false
+  echoToAdd.value.private = echoToUpdate.value?.private || false
+  echoToAdd.value.layout = echoToUpdate.value?.layout || 'waterfall'
 
       // 2. 填充图片
       if (echoToUpdate.value?.images && echoToUpdate.value.images.length > 0) {

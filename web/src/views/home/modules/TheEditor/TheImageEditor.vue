@@ -38,6 +38,17 @@
       </div>
     </div>
 
+    <!-- 布局方式选择 -->
+    <div class="mb-3 flex items-center gap-2">
+      <span class="text-gray-500">布局方式：</span>
+      <BaseSelect
+        v-model="echoToAdd.layout"
+        :options="layoutOptions"
+        class="w-32 h-7"
+        placeholder="请选择布局方式"
+      />
+    </div>
+
     <!-- 当前上传方式与状态 -->
     <div class="text-gray-300 text-sm mb-1">
       当前上传方式为
@@ -93,19 +104,29 @@
 import { useEditorStore } from '@/stores/editor'
 import { useSettingStore } from '@/stores/setting'
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 import { ImageSource } from '@/enums/enums'
 import Url from '@/components/icons/url.vue'
 import Upload from '@/components/icons/upload.vue'
 import Bucket from '@/components/icons/bucket.vue'
 import Addmore from '@/components/icons/addmore.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseSelect from '@/components/common/BaseSelect.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import TheUppy from '@/components/advanced/TheUppy.vue'
 
 const editorStore = useEditorStore()
-const { imageToAdd, ImageUploading } = storeToRefs(editorStore)
+const { imageToAdd, ImageUploading, echoToAdd } = storeToRefs(editorStore)
 const settingStore = useSettingStore()
 const { S3Setting } = storeToRefs(settingStore)
+
+// 布局选择（绑定到 editorStore.echoToAdd.layout）
+const layoutOptions = [
+  { label: '瀑布流', value: 'waterfall' },
+  { label: '九宫格', value: 'grid' },
+  { label: '单图轮播', value: 'carousel' },
+  { label: '水平轮播', value: 'horizontal' },
+]
 </script>
 
 <style scoped></style>

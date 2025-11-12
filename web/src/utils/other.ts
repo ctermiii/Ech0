@@ -60,12 +60,17 @@ export const formatDate = (dateString: string) => {
 export const parseMusicURL = (url: string) => {
   url = url.trim()
 
-  const neteaseMatch = url.match(/music\.163\.com\/(#\/)?(song|playlist|album)(\?id=|\/)(\d+)/)
+  // 网易云音乐 - 修复id参数位置问题
+  const neteaseMatch = url.match(/music\.163\.com\/(#\/)?(song|playlist|album)(\?.*)?/)
   if (neteaseMatch) {
-    return {
-      server: MusicProvider.NETEASE,
-      type: neteaseMatch[1], // song, playlist, album
-      id: neteaseMatch[2],
+    // 从查询参数中提取id
+    const idMatch = url.match(/[?&]id=(\d+)/)
+    if (idMatch) {
+      return {
+        server: MusicProvider.NETEASE,
+        type: neteaseMatch[2], // song, playlist, album
+        id: idMatch[1],
+      }
     }
   }
 
@@ -76,6 +81,16 @@ export const parseMusicURL = (url: string) => {
       server: MusicProvider.QQ,
       type: 'song',
       id: qqNewSongMatch[1],
+    }
+  }
+
+  // QQ音乐 - 旧格式playsong，支持各种子域名前缀
+  const qqOldSongMatch = url.match(/(?:i\d*\.)?y\.qq\.com\/.*[?&]songid=(\d+)/)
+  if (qqOldSongMatch) {
+    return {
+      server: MusicProvider.QQ,
+      type: 'song',
+      id: qqOldSongMatch[1],
     }
   }
 
@@ -92,6 +107,51 @@ export const parseMusicURL = (url: string) => {
   // 解析失败
   return null
 }
+
+
+/**
+ * 从一段文本中提取并返回最短、最规范的音乐链接
+ * @param input 包含音乐链接的原始文本
+ * @returns 返回清理后的音乐链接字符串，如果找不到则返回 null
+ */
+export const extractAndCleanMusicURL = (input: string): string | null => {
+  const text = input.trim();
+
+  // 网易云音乐
+  // 匹配并捕获完整的、包含id参数的网易云链接
+  const neteaseMatch = text.match(/(https?:\/\/music\.163\.com\/(#\/)?(song|playlist|album)\?id=\d+)/i);
+  if (neteaseMatch) {
+    // neteaseMatch[1] 就是第一个捕获组，即我们想要的完整链接
+    return neteaseMatch?.[1]?.replace(/^http:\/\//, 'https://') ?? null; // 统一为https
+  }
+
+  // QQ音乐 新格式
+  // 匹配并捕获 songDetail 路径的链接
+  const qqNewMatch = text.match(/(https?:\/\/y\.qq\.com\/n\/ryqq\/songDetail\/[a-zA-Z0-9]+)/i);
+  if (qqNewMatch) {
+    return qqNewMatch?.[1]?.replace(/^http:\/\//, 'https://') ?? null;
+  }
+
+  // QQ音乐 旧格式
+  // 这个稍微复杂，因为可能还有其他参数。我们只关心songid
+  const qqOldMatch = text.match(/(https?:\/\/(?:i\d*\.)?y\.qq\.com\/\S*)[?&]songid=(\d+)/i);
+  if (qqOldMatch) {
+    const baseUrl = qqOldMatch?.[1]?.replace(/^http:\/\//, 'https://') ?? null;
+    const songId = qqOldMatch?.[2] ?? null;
+    // 重新构建最短链接，只保留songid参数
+    return `${baseUrl}?songid=${songId}`;
+  }
+
+  // Apple Music
+  // 匹配并捕获 Apple Music 的 song 或 album 链接
+  const appleMatch = text.match(/(https?:\/\/music\.apple\.com\/[a-z]{2}\/(song|album)\/[^\/]+\/\d+)/i);
+  if (appleMatch) {
+    return appleMatch?.[1]?.replace(/^http:\/\//, 'https://') ?? null;
+  }
+
+  // 如果没有匹配到任何规则
+  return null;
+};
 
 // 获取图片尺寸
 export async function getImageSize(file: File): Promise<{ width: number; height: number }> {

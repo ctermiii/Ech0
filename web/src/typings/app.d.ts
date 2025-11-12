@@ -439,6 +439,7 @@ declare namespace App {
         image_source: string
         images: Image[]
         tags?: Tag[]
+        layout?: string
         private: boolean
         user_id: number
         extension: string

@@ -105,7 +105,11 @@
       <div class="px-4 py-3">
         <!-- 根据布局决定文字与图片顺序 -->
         <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
-        <template v-if="props.echo.layout === 'grid' || props.echo.layout === 'horizontal'">
+        <template
+          v-if="
+            props.echo.layout === ImageLayout.GRID || props.echo.layout === ImageLayout.HORIZONTAL
+          "
+        >
           <!-- 文字在上 -->
           <div class="mx-auto w-11/12 pl-1 mb-3">
             <MdPreview
@@ -191,7 +195,7 @@ import { useEchoStore } from '@/stores/echo'
 import { useEditorStore } from '@/stores/editor'
 import { localStg } from '@/utils/storage'
 import { useRouter } from 'vue-router'
-import { ExtensionType } from '@/enums/enums'
+import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
 import { useBaseDialog } from '@/composables/useBaseDialog'
 const { openConfirm } = useBaseDialog()

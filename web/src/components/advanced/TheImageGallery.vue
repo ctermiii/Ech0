@@ -2,7 +2,7 @@
   <div v-if="images?.length" class="image-gallery-container">
     <!-- 瀑布流布局 -->
     <div
-      v-if="layout === 'waterfall' || !layout"
+      v-if="layout === ImageLayout.WATERFALL || !layout"
       :class="[
         'imgwidth mx-auto grid gap-2 mb-4',
         images.length === 1 ? 'grid-cols-1 justify-items-center' : 'grid-cols-2',
@@ -25,7 +25,7 @@
     </div>
 
     <!-- 九宫格布局 -->
-    <div v-if="layout === 'grid'" class="imgwidth mx-auto mb-4">
+    <div v-if="layout === ImageLayout.GRID" class="imgwidth mx-auto mb-4">
       <div class="grid grid-cols-3 gap-2">
         <button
           v-for="(src, idx) in displayedImages"
@@ -48,7 +48,7 @@
     </div>
 
     <!-- 单图轮播布局 -->
-    <div v-if="layout === 'carousel'" class="imgwidth mx-auto mb-4">
+    <div v-if="layout === ImageLayout.CAROUSEL" class="imgwidth mx-auto mb-4">
       <div class="carousel-container">
         <button
           v-if="images[carouselIndex]"
@@ -56,7 +56,11 @@
           @click="openFancybox(carouselIndex)"
         >
           <img
-            :src="baseUrl ? getHubImageUrl(images[carouselIndex]!, baseUrl) : getImageUrl(images[carouselIndex]!)"
+            :src="
+              baseUrl
+                ? getHubImageUrl(images[carouselIndex]!, baseUrl)
+                : getImageUrl(images[carouselIndex]!)
+            "
             :alt="`预览图片${carouselIndex + 1}`"
             loading="lazy"
             class="echoimg w-full h-auto"
@@ -64,25 +68,43 @@
         </button>
 
         <div v-if="images.length > 1" class="carousel-controls">
-          <button class="carousel-btn carousel-prev" @click="prevCarousel" :disabled="carouselIndex === 0">←</button>
+          <button
+            class="carousel-btn carousel-prev"
+            @click="prevCarousel"
+            :disabled="carouselIndex === 0"
+          >
+            ←
+          </button>
           <div class="carousel-indicator">{{ carouselIndex + 1 }} / {{ images.length }}</div>
-          <button class="carousel-btn carousel-next" @click="nextCarousel" :disabled="carouselIndex === images.length - 1">→</button>
+          <button
+            class="carousel-btn carousel-next"
+            @click="nextCarousel"
+            :disabled="carouselIndex === images.length - 1"
+          >
+            →
+          </button>
         </div>
 
         <div v-if="images.length > 1" class="carousel-dots">
-          <button v-for="(_, idx) in images" :key="idx" class="carousel-dot" :class="{ active: idx === carouselIndex }" @click="carouselIndex = idx" />
+          <button
+            v-for="(_, idx) in images"
+            :key="idx"
+            class="carousel-dot"
+            :class="{ active: idx === carouselIndex }"
+            @click="carouselIndex = idx"
+          />
         </div>
       </div>
     </div>
 
     <!-- 水平轮播布局 -->
-    <div v-if="layout === 'horizontal'" class="imgwidth mx-auto mb-4">
+    <div v-if="layout === ImageLayout.HORIZONTAL" class="imgwidth mx-auto mb-4">
       <div class="horizontal-scroll-container">
         <div class="horizontal-scroll-wrapper">
           <button
             v-for="(src, idx) in images"
             :key="idx"
-            class="horizontal-item bg-transparent border-0 p-0 cursor-pointer flex-shrink-0"
+            class="horizontal-item bg-transparent border-0 p-0 cursor-pointer shrink-0"
             @click="openFancybox(idx)"
           >
             <img
@@ -104,24 +126,27 @@ import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
 import { getImageUrl, getHubImageUrl } from '@/utils/other'
 import { Fancybox } from '@fancyapps/ui'
 import '@fancyapps/ui/dist/fancybox/fancybox.css'
+import { ImageLayout } from '@/enums/enums'
 
 const props = defineProps<{
   images: App.Api.Ech0.Echo['images']
   baseUrl?: string
-  layout?: 'waterfall' | 'grid' | 'carousel' | 'horizontal' | string
+  layout?: ImageLayout | string | undefined
 }>()
 
 const baseUrl = props.baseUrl
 
 // 布局状态（来自 props.layout）
-const layout = props.layout || 'waterfall'
+const layout = props.layout || ImageLayout.WATERFALL
 
 // 轮播索引
 const carouselIndex = ref(0)
 
 // 只显示前 9 张（用于九宫格），第 9 张显示 "+N" 覆盖层
 const displayedImages = computed(() => (props.images ? props.images.slice(0, 9) : []))
-const extraCount = computed(() => (props.images ? (props.images.length > 9 ? props.images.length - 9 : 0) : 0))
+const extraCount = computed(() =>
+  props.images ? (props.images.length > 9 ? props.images.length - 9 : 0) : 0,
+)
 
 // 瀑布流布局：获取列跨度
 const getColSpan = (idx: number, total: number) => {
@@ -160,8 +185,8 @@ function openFancybox(startIndex: number) {
       Backspace: 'close',
       ArrowDown: 'next',
       ArrowUp: 'prev',
-        PageUp: 'close',
-        PageDown: 'close',
+      PageUp: 'close',
+      PageDown: 'close',
     },
   })
 }
@@ -189,7 +214,9 @@ onBeforeUnmount(() => {})
     0 2px 4px rgba(0, 0, 0, 0.02),
     0 4px 8px rgba(0, 0, 0, 0.02),
     0 8px 16px rgba(0, 0, 0, 0.02);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 button:hover .echoimg {
@@ -202,24 +229,136 @@ button:hover .echoimg {
 }
 
 /* carousel, horizontal, grid styles (copied/adapted from provided template) */
-.carousel-container { position: relative; width: 100%; }
-.carousel-slide { position: relative; width: 100%; display: block; }
-.carousel-controls { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display:flex; align-items:center; gap:16px; background: rgba(0,0,0,0.4); padding:8px 16px; border-radius:20px; z-index:10; }
-.carousel-btn { background-color: rgba(255,255,255,0.8); border:none; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; color:#333 }
-.carousel-btn:hover:not(:disabled) { background-color: white; transform: scale(1.1); }
-.carousel-btn:disabled { opacity:0.5; cursor:not-allowed }
-.carousel-indicator { color:white; font-size:12px; min-width:50px; text-align:center }
-.carousel-dots { position: absolute; bottom: 60px; left:50%; transform: translateX(-50%); display:flex; gap:8px; z-index:10 }
-.carousel-dot { width:8px; height:8px; border-radius:50%; background-color: rgba(255,255,255,0.5); border:none; cursor:pointer; transition:all 0.3s ease; padding:0 }
-.carousel-dot:hover { background-color: rgba(255,255,255,0.8) }
-.carousel-dot.active { background-color: white; transform: scale(1.2) }
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+.carousel-slide {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+.carousel-controls {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: 20px;
+  z-index: 10;
+}
+.carousel-btn {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #333;
+}
+.carousel-btn:hover:not(:disabled) {
+  background-color: white;
+  transform: scale(1.1);
+}
+.carousel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.carousel-indicator {
+  color: white;
+  font-size: 12px;
+  min-width: 50px;
+  text-align: center;
+}
+.carousel-dots {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+.carousel-dot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.carousel-dot.active {
+  background-color: white;
+  transform: scale(1.2);
+}
 
-.horizontal-scroll-container { position: relative; width:100%; overflow-x:auto; overflow-y:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.1) transparent }
-.horizontal-scroll-container::-webkit-scrollbar { height:4px }
-.horizontal-scroll-wrapper { display:flex; gap:8px; padding:4px 0; align-items:center }
-.horizontal-item { flex-shrink:0; height:200px; width:auto; min-width:160px; overflow:hidden }
-.scroll-hint { text-align:center; font-size:12px; color:#999; margin-top:8px; animation: hint-pulse 2s infinite }
-@keyframes hint-pulse { 0%,100%{ opacity:0.5 } 50%{ opacity:1 } }
+.horizontal-scroll-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+.horizontal-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+.horizontal-scroll-wrapper {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  align-items: center;
+}
+.horizontal-item {
+  flex-shrink: 0;
+  height: 200px;
+  width: auto;
+  min-width: 160px;
+  overflow: hidden;
+}
+.scroll-hint {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+  animation: hint-pulse 2s infinite;
+}
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 
-.more-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); color:#fff; font-size:20px; font-weight:600; border-radius:8px }
+.more-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  border-radius: 8px;
+}
 </style>

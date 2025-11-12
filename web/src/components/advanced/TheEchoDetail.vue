@@ -29,7 +29,11 @@
       <div class="py-4">
         <!-- 根据布局决定文字与图片顺序 -->
         <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
-        <template v-if="props.echo.layout === 'grid' || props.echo.layout === 'horizontal'">
+        <template
+          v-if="
+            props.echo.layout === ImageLayout.GRID || props.echo.layout === ImageLayout.HORIZONTAL
+          "
+        >
           <!-- 文字在上 -->
           <div class="mb-3">
             <MdPreview
@@ -166,8 +170,9 @@ import { storeToRefs } from 'pinia'
 import { fetchGetStatus } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
 import { getApiUrl } from '@/service/request/shared'
-import { ExtensionType } from '@/enums/enums'
+import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
+import Image from '../icons/image.vue'
 
 const emit = defineEmits(['updateLikeCount'])
 

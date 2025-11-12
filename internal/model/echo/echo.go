@@ -68,9 +68,9 @@ const (
 	ImageSourceURL   = "url"   // 直链图片
 	ImageSourceS3    = "s3"    // S3 图片
 
-	LayoutWaterfall = "waterfall" // 瀑布流布局
-	LayoutGrid      = "grid"      // 九宫格布局
-	LayoutHorizontal  = "horizontal"  // 横向布局
-	LayoutCarousel    = "carousel"    // 单图轮播布局
+	LayoutWaterfall  = "waterfall"  // 瀑布流布局
+	LayoutGrid       = "grid"       // 九宫格布局
+	LayoutHorizontal = "horizontal" // 横向布局
+	LayoutCarousel   = "carousel"   // 单图轮播布局
 
 )

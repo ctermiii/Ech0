@@ -172,7 +172,6 @@ import { useSettingStore } from '@/stores/setting'
 import { getApiUrl } from '@/service/request/shared'
 import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
-import Image from '../icons/image.vue'
 
 const emit = defineEmits(['updateLikeCount'])
 

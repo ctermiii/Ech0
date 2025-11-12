@@ -89,7 +89,7 @@ watch(
       // 更新输入框的值为干净的链接
       editorStore.extensionToAdd.extension = cleanUrl
     }
-  }
+  },
 )
 </script>
 

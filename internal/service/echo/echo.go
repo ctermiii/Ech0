@@ -62,8 +62,7 @@ func (echoService *EchoService) PostEcho(userid uint, newEcho *model.Echo) error
 
 	// 检查图片布局
 	layout := strings.TrimSpace(newEcho.Layout)
-	if layout == "" || (
-		layout != model.LayoutWaterfall &&
+	if layout == "" || (layout != model.LayoutWaterfall &&
 		layout != model.LayoutGrid &&
 		layout != model.LayoutHorizontal &&
 		layout != model.LayoutCarousel) {
@@ -292,8 +291,7 @@ func (echoService *EchoService) UpdateEcho(userid uint, echo *model.Echo) error 
 
 	// 检查图片布局
 	layout := strings.TrimSpace(echo.Layout)
-	if layout == "" || (
-		layout != model.LayoutWaterfall &&
+	if layout == "" || (layout != model.LayoutWaterfall &&
 		layout != model.LayoutGrid &&
 		layout != model.LayoutHorizontal &&
 		layout != model.LayoutCarousel) {

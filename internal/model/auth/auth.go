@@ -76,10 +76,10 @@ type GoogleUser struct {
 
 // QQTokenResponse QQ token 响应结构
 type QQTokenResponse struct {
-    AccessToken  string `json:"access_token"`
-    ExpiresIn    int64  `json:"expires_in"`
-    RefreshToken string `json:"refresh_token"`
-    OpenID       string `json:"openid,omitempty"`
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int64  `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	OpenID       string `json:"openid,omitempty"`
 }
 
 // QQOpenIDResponse QQ OpenID 响应结构
@@ -90,11 +90,11 @@ type QQOpenIDResponse struct {
 
 // QQUser QQ 用户信息
 type QQUser struct {
-	Nickname   string `json:"nickname"`
-	FigureURL  string `json:"figureurl"`
-	FigureURL1 string `json:"figureurl_1"`
-	FigureURL2 string `json:"figureurl_2"`
+	Nickname     string `json:"nickname"`
+	FigureURL    string `json:"figureurl"`
+	FigureURL1   string `json:"figureurl_1"`
+	FigureURL2   string `json:"figureurl_2"`
 	FigureURLQQ1 string `json:"figureurl_qq_1"`
 	FigureURLQQ2 string `json:"figureurl_qq_2"`
-	Gender     string `json:"gender"`
+	Gender       string `json:"gender"`
 }

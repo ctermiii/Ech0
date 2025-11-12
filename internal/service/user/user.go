@@ -601,7 +601,7 @@ func (userService *UserService) buildOAuthAuthorizeURL(
 			params.Set("scope", scope)
 		}
 		return fmt.Sprintf("%s?%s", setting.AuthURL, params.Encode())
-	
+
 	case string(commonModel.OAuth2CUSTOM):
 		params := url.Values{}
 		params.Set("client_id", setting.ClientID)
@@ -686,7 +686,10 @@ func (userService *UserService) resolveOAuthCallback(
 }
 
 // 用 code 换取 access_token
-func exchangeGithubCodeForToken(setting *settingModel.OAuth2Setting, code string) (*authModel.GitHubTokenResponse, error) {
+func exchangeGithubCodeForToken(
+	setting *settingModel.OAuth2Setting,
+	code string,
+) (*authModel.GitHubTokenResponse, error) {
 	data := map[string]string{
 		"client_id":     setting.ClientID,
 		"client_secret": setting.ClientSecret,

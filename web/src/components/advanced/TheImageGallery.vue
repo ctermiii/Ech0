@@ -49,7 +49,7 @@
 
     <!-- 单图轮播布局 -->
     <div v-if="layout === ImageLayout.CAROUSEL" class="imgwidth mx-auto mb-4">
-      <div class="carousel-container">
+      <div class="carousel-container rounded-lg overflow-hidden">
         <button
           v-if="images[carouselIndex]"
           class="carousel-slide bg-transparent border-0 p-0 cursor-pointer w-full overflow-hidden"
@@ -66,34 +66,27 @@
             class="echoimg w-full h-auto"
           />
         </button>
+      </div>
 
-        <div v-if="images.length > 1" class="carousel-controls">
-          <button
-            class="carousel-btn carousel-prev"
-            @click="prevCarousel"
-            :disabled="carouselIndex === 0"
-          >
-            ←
-          </button>
-          <div class="carousel-indicator">{{ carouselIndex + 1 }} / {{ images.length }}</div>
-          <button
-            class="carousel-btn carousel-next"
-            @click="nextCarousel"
-            :disabled="carouselIndex === images.length - 1"
-          >
-            →
-          </button>
-        </div>
-
-        <div v-if="images.length > 1" class="carousel-dots">
-          <button
-            v-for="(_, idx) in images"
-            :key="idx"
-            class="carousel-dot"
-            :class="{ active: idx === carouselIndex }"
-            @click="carouselIndex = idx"
-          />
-        </div>
+      <div
+        v-if="images.length > 1"
+        class="carousel-nav mt-3 flex items-center justify-center gap-3 text-gray-500"
+      >
+        <button
+          class="nav-btn flex items-center justify-center w-8 h-8 rounded-full transition disabled:opacity-40 disabled:cursor-not-allowed"
+          @click="prevCarousel"
+          :disabled="carouselIndex === 0"
+        >
+          <Prev class="w-5 h-5 text-gray-600" />
+        </button>
+        <span class="text-sm"> {{ carouselIndex + 1 }} / {{ images.length }} </span>
+        <button
+          class="nav-btn flex items-center justify-center w-8 h-8 rounded-full transition disabled:opacity-40 disabled:cursor-not-allowed"
+          @click="nextCarousel"
+          :disabled="carouselIndex === images.length - 1"
+        >
+          <Next class="w-5 h-5 text-gray-600" />
+        </button>
       </div>
     </div>
 
@@ -104,7 +97,7 @@
           <button
             v-for="(src, idx) in images"
             :key="idx"
-            class="horizontal-item bg-transparent border-0 p-0 cursor-pointer shrink-0"
+            class="horizontal-item bg-transparent rounded-lg border-0 p-0 cursor-pointer shrink-0"
             @click="openFancybox(idx)"
           >
             <img
@@ -127,6 +120,8 @@ import { getImageUrl, getHubImageUrl } from '@/utils/other'
 import { Fancybox } from '@fancyapps/ui'
 import '@fancyapps/ui/dist/fancybox/fancybox.css'
 import { ImageLayout } from '@/enums/enums'
+import Prev from '@/components/icons/prev.vue'
+import Next from '@/components/icons/next.vue'
 
 const props = defineProps<{
   images: App.Api.Ech0.Echo['images']
@@ -220,7 +215,7 @@ onBeforeUnmount(() => {})
 }
 
 button:hover .echoimg {
-  transform: scale(1.03);
+  transform: scale(1.02);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.04),
     0 4px 8px rgba(0, 0, 0, 0.04),
@@ -237,73 +232,6 @@ button:hover .echoimg {
   position: relative;
   width: 100%;
   display: block;
-}
-.carousel-controls {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 8px 16px;
-  border-radius: 20px;
-  z-index: 10;
-}
-.carousel-btn {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  color: #333;
-}
-.carousel-btn:hover:not(:disabled) {
-  background-color: white;
-  transform: scale(1.1);
-}
-.carousel-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.carousel-indicator {
-  color: white;
-  font-size: 12px;
-  min-width: 50px;
-  text-align: center;
-}
-.carousel-dots {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 10;
-}
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-.carousel-dot:hover {
-  background-color: rgba(255, 255, 255, 0.8);
-}
-.carousel-dot.active {
-  background-color: white;
-  transform: scale(1.2);
 }
 
 .horizontal-scroll-container {
@@ -329,7 +257,7 @@ button:hover .echoimg {
   flex-shrink: 0;
   height: 200px;
   width: auto;
-  min-width: 160px;
+  /* min-width: 160px; */
   overflow: hidden;
 }
 .scroll-hint {

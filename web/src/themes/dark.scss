@@ -1,3 +1,20 @@
 :root.dark {
-  --bg-color: #1e1e1e;
+  --bg-color: #1a1a1a;
+  --text-color: #f4f4f4;
+
+  --card-color: #262626;
+  --card-text-color: oklch(0.98 0 0);
+
+  --widget-bg-color: #262626;
+  --widget-title-color: oklch(0.97 0 0);
+  --widget-text-color: oklch(0.97 0.01 136.32);
+
+  --timeline-line-color: oklch(0.3 0 0);
+  --timeline-dot-color: oklch(0.6 0.02 216.48);
+  --timeline-datetime-color: oklch(0.7 0.01 136.32);
+  --timeline-tag-color: oklch(0.8 0.02 216.48);
+
+  --echo-text-color: oklch(0.9 0.01 136.32);
+
+  --btn-bg-color: oklch(0.3 0.02 216.48);
 }

@@ -125,6 +125,7 @@ import { storeToRefs } from 'pinia'
 import { useEditorStore } from '@/stores/editor'
 import { useEchoStore } from '@/stores/echo'
 import { theToast } from '@/utils/toast'
+import { localStg } from '@/utils/storage'
 
 const editorStore = useEditorStore()
 const { currentMode, isUpdateMode, echoToAdd, imageToAdd, tagToAdd } = storeToRefs(editorStore)
@@ -143,6 +144,13 @@ const handleAddImageMode = () => {
   if (imageToAdd.value.image_source === '') {
     imageToAdd.value.image_source = ImageSource.LOCAL
   }
+
+  // 检查localStg中是否有记忆的上传方式
+  const rememberedSource = localStg.getItem<ImageSource>('image_source')
+  if (rememberedSource) {
+    imageToAdd.value.image_source = rememberedSource
+  }
+
   editorStore.setMode(Mode.Image)
 }
 

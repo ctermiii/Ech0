@@ -8,14 +8,14 @@
         <BaseButton
           :icon="Url"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.URL"
+          @click="handleSetImageSource(ImageSource.URL)"
           title="插入图片链接"
         />
         <!-- 上传本地 -->
         <BaseButton
           :icon="Upload"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.LOCAL"
+          @click="handleSetImageSource(ImageSource.LOCAL)"
           title="上传本地图片"
         />
         <!-- S3 存储 -->
@@ -23,7 +23,7 @@
           v-if="S3Setting.enable"
           :icon="Bucket"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.S3"
+          @click="handleSetImageSource(ImageSource.S3)"
           title="S3存储图片"
         />
       </div>
@@ -113,11 +113,19 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseSelect from '@/components/common/BaseSelect.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import TheUppy from '@/components/advanced/TheUppy.vue'
+import { localStg } from '@/utils/storage'
 
 const editorStore = useEditorStore()
 const { imageToAdd, ImageUploading, echoToAdd } = storeToRefs(editorStore)
 const settingStore = useSettingStore()
 const { S3Setting } = storeToRefs(settingStore)
+
+const handleSetImageSource = (source: ImageSource) => {
+  imageToAdd.value.image_source = source
+
+  // 记忆上传方式
+  localStg.setItem('image_source', source)
+}
 
 // 布局选择
 const layoutOptions = [

@@ -5,6 +5,7 @@ import { fetchAddEcho, fetchUpdateEcho, fetchAddTodo, fetchGetMusic } from '@/se
 import { Mode, ExtensionType, ImageSource, ImageLayout } from '@/enums/enums'
 import { useEchoStore } from '@/stores/echo'
 import { useTodoStore } from '@/stores/todo'
+import { localStg } from '@/utils/storage'
 
 export const useEditorStore = defineStore('editorStore', () => {
   const echoStore = useEchoStore()
@@ -97,6 +98,10 @@ export const useEditorStore = defineStore('editorStore', () => {
 
   // 清空并重置编辑器
   const clearEditor = () => {
+    const rememberedImageSource = ref<ImageSource>(
+      localStg.getItem<ImageSource>('image_source') ?? ImageSource.LOCAL
+    )
+
     echoToAdd.value = {
       content: '',
       images: [],
@@ -108,7 +113,7 @@ export const useEditorStore = defineStore('editorStore', () => {
     }
     imageToAdd.value = {
       image_url: '',
-      image_source: ImageSource.LOCAL,
+      image_source: rememberedImageSource.value,
       object_key: '',
     }
     imagesToAdd.value = []

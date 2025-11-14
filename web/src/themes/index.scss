@@ -1,0 +1,12 @@
+// File: src/themes/index.scss
+@import './light.scss';
+@import './dark.scss';
+
+// widget
+.widget {
+  background-color: var(--widget-bg-color);
+  color: var(--widget-text-color);
+}
+.widget-title {
+  color: var(--widget-title-color);
+}

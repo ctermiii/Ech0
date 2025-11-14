@@ -39,10 +39,12 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { fetchGetStatus, fetchHelloEch0 } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
+import { useThemeStore } from '@/stores/theme'
 import { getApiUrl } from '@/service/request/shared'
 import { theToast } from '@/utils/toast'
 
 const settingStore = useSettingStore()
+const themeStore = useThemeStore()
 
 const { SystemSetting } = storeToRefs(settingStore)
 
@@ -50,6 +52,8 @@ const apiUrl = getApiUrl()
 const logo = ref<string>('/favicon.svg')
 
 const handleHello = () => {
+  themeStore.toggleTheme()
+
   const hello = ref<App.Api.Ech0.HelloEch0>()
 
   fetchHelloEch0().then((res) => {

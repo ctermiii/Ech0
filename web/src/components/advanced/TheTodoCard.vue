@@ -26,7 +26,7 @@
           />
         </div>
       </div>
-      <div v-else>
+      <div v-else class="widget">
         <p class="text-gray-600 font-bold text-lg flex items-center">
           <Busy class="mr-1" /> 待办事项：
         </p>

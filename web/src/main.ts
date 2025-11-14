@@ -1,5 +1,5 @@
 import 'virtual:uno.css'
-import '@/themes'
+import '@/themes/index.scss'
 
 import { initStores } from './stores/store-init'
 

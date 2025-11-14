@@ -1,10 +1,35 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { localStg } from "@/utils/storage";
 
-const useThemeStore = defineStore('themeStore', () => {
-  const theme = ref<'light' | 'dark'>('light');
+type ThemeType = 'light' | 'dark';
+
+export const useThemeStore = defineStore('themeStore', () => {
+  const savedTheme = localStg.getItem('theme');
+  const theme = ref<ThemeType>(
+    savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light'
+  );
+
+  const toggleTheme = () => {
+    theme.value = theme.value === 'light' ? 'dark' : 'light';
+    applyTheme(theme.value);
+  }
+
+  const applyTheme = (t: ThemeType) => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(t);
+    localStg.setItem('theme', t);
+  }
+
+
+  const init = () => {
+    applyTheme(theme.value);
+  }
 
   return {
     theme,
+    toggleTheme,
+    applyTheme,
+    init,
   }
 });

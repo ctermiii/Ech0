@@ -1,20 +1,31 @@
 :root.dark {
+  // 主体
   --bg-color: #1a1a1a;
   --text-color: #f4f4f4;
 
+  // 通用卡片
   --card-color: #262626;
   --card-text-color: oklch(0.98 0 0);
 
+  // 编辑器
+  --editor-bg-color: #262626;
+  --editor-text-color: oklch(0.98 0 0);
+  --editor-title-color: oklch(0.9 0.01 136.32);
+
+  // 小组件
   --widget-bg-color: #262626;
   --widget-title-color: oklch(0.97 0 0);
   --widget-text-color: oklch(0.97 0.01 136.32);
 
+  // 时间轴
   --timeline-line-color: oklch(0.3 0 0);
   --timeline-dot-color: oklch(0.6 0.02 216.48);
   --timeline-datetime-color: oklch(0.7 0.01 136.32);
   --timeline-tag-color: oklch(0.8 0.02 216.48);
 
+  // Echo
   --echo-text-color: oklch(0.9 0.01 136.32);
 
+  // 通用组件
   --btn-bg-color: oklch(0.3 0.02 216.48);
 }

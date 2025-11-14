@@ -15,7 +15,7 @@
           <BaseButton
             :icon="Delete"
             @click="handleDeleteTodo"
-            class="w-7 h-7 rounded-md !text-red-200"
+            class="w-7 h-7 rounded-md text-red-200!"
             title="删除待办"
           />
           <BaseButton

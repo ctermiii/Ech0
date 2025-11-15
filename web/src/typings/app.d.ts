@@ -62,6 +62,7 @@ declare namespace App {
         image_url: string
         image_source: string
         images: Image[]
+        layout?: string
         private: boolean
         user_id: number
         extension: string
@@ -107,6 +108,7 @@ declare namespace App {
         content: string
         images?: ImageToAdd[] | null
         tags?: TagToAdd[] | null
+        layout?: string | null
         extension?: string | null
         extension_type?: string | null
         private: boolean
@@ -118,6 +120,7 @@ declare namespace App {
         username: string
         images?: ImageToAdd[] | null
         tags?: TagToAdd[] | null
+        layout?: string | null
         private: boolean
         user_id: number
         extension?: string | null
@@ -436,6 +439,7 @@ declare namespace App {
         image_source: string
         images: Image[]
         tags?: Tag[]
+        layout?: string
         private: boolean
         user_id: number
         extension: string

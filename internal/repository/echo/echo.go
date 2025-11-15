@@ -220,6 +220,7 @@ func (echoRepository *EchoRepository) UpdateEcho(ctx context.Context, echo *mode
 		Updates(map[string]interface{}{
 			"content":        echo.Content,
 			"private":        echo.Private,
+			"layout":         echo.Layout,
 			"extension":      echo.Extension,
 			"extension_type": echo.ExtensionType,
 		}).Error; err != nil {

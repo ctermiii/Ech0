@@ -8,6 +8,7 @@ type Echo struct {
 	Content       string    `gorm:"type:text;not null"                               json:"content"`
 	Username      string    `gorm:"type:varchar(100)"                                json:"username,omitempty"`
 	Images        []Image   `gorm:"foreignKey:MessageID;constraint:OnDelete:CASCADE" json:"images,omitempty"`
+	Layout        string    `gorm:"type:varchar(50);default:'waterfall'"             json:"layout,omitempty"`
 	Private       bool      `gorm:"default:false"                                    json:"private"`
 	UserID        uint      `gorm:"not null;index"                                   json:"user_id"`
 	Extension     string    `gorm:"type:text"                                        json:"extension,omitempty"`
@@ -66,4 +67,10 @@ const (
 	ImageSourceLocal = "local" // 本地图片
 	ImageSourceURL   = "url"   // 直链图片
 	ImageSourceS3    = "s3"    // S3 图片
+
+	LayoutWaterfall  = "waterfall"  // 瀑布流布局
+	LayoutGrid       = "grid"       // 九宫格布局
+	LayoutHorizontal = "horizontal" // 横向布局
+	LayoutCarousel   = "carousel"   // 单图轮播布局
+
 )

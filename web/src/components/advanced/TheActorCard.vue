@@ -24,7 +24,7 @@
 
       <!-- 关注按钮 （等待接收、已关注、关注） -->
       <BaseButton
-        class="rounded-md border border-dashed border-orange-400 !bg-transparent !shadow-none !ring-0 text-sm !text-orange-600 hover:!text-orange-400"
+        class="rounded-md border border-dashed border-orange-400 bg-transparent! shadow-none! ring-0! text-sm text-orange-600! hover:text-orange-400!"
         @click="handleFollow"
       >
         <template v-if="followStatus === FollowStatus.NONE">关注</template>

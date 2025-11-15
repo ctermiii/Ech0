@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="flex flex-col gap-2 p-4 bg-white rounded-md ring-1 ring-gray-200 ring-inset mx-auto shadow-sm hover:shadow-md"
+      class="widget flex flex-col gap-2 p-4 rounded-md ring-1 ring-[var(--ring-color)] ring-inset mx-auto shadow-sm hover:shadow-md"
     >
       <!-- 顶部id + 按钮 -->
       <div v-if="props.operative" class="flex justify-between items-center">
@@ -15,7 +15,7 @@
           <BaseButton
             :icon="Delete"
             @click="handleDeleteTodo"
-            class="w-7 h-7 rounded-md !text-red-200"
+            class="w-7 h-7 rounded-md text-red-200!"
             title="删除待办"
           />
           <BaseButton
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div v-else>
-        <p class="text-gray-600 font-bold text-lg flex items-center">
+        <p class="text-[var(--widget-title-color)] font-bold text-lg flex items-center">
           <Busy class="mr-1" /> 待办事项：
         </p>
       </div>

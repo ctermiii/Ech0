@@ -290,7 +290,7 @@ ssh -p 6278 ssh.vaaat.com
 ## Development Guide
 
 ### Backend Requirements
-- Go 1.25.1+  
+- Go 1.25.3+  
 - C Compiler for CGO (`go-sqlite3`):
   - Windows: [MinGW-w64](https://winlibs.com/)  
   - macOS: `brew install gcc`  
@@ -300,7 +300,7 @@ ssh -p 6278 ssh.vaaat.com
 - Swagger: `swag init -g internal/server/server.go -o internal/swagger`  
 
 ### Frontend Requirements
-- NodeJS v24.5.0+, PNPM v10.17.1+  
+- NodeJS v24.10.0+, PNPM v10.20.1+  
 - Use [fnm](https://github.com/Schniz/fnm) if multiple Node versions needed
 
 ### Start Backend & Frontend

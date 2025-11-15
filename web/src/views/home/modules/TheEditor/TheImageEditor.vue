@@ -8,14 +8,14 @@
         <BaseButton
           :icon="Url"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.URL"
+          @click="handleSetImageSource(ImageSource.URL)"
           title="插入图片链接"
         />
         <!-- 上传本地 -->
         <BaseButton
           :icon="Upload"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.LOCAL"
+          @click="handleSetImageSource(ImageSource.LOCAL)"
           title="上传本地图片"
         />
         <!-- S3 存储 -->
@@ -23,7 +23,7 @@
           v-if="S3Setting.enable"
           :icon="Bucket"
           class="w-7 h-7 sm:w-7 sm:h-7 rounded-md"
-          @click="imageToAdd.image_source = ImageSource.S3"
+          @click="handleSetImageSource(ImageSource.S3)"
           title="S3存储图片"
         />
       </div>
@@ -36,6 +36,17 @@
           title="添加更多图片"
         />
       </div>
+    </div>
+
+    <!-- 布局方式选择 -->
+    <div class="mb-3 flex items-center gap-2">
+      <span class="text-gray-500">布局方式：</span>
+      <BaseSelect
+        v-model="echoToAdd.layout"
+        :options="layoutOptions"
+        class="w-32 h-7"
+        placeholder="请选择布局方式"
+      />
     </div>
 
     <!-- 当前上传方式与状态 -->
@@ -93,19 +104,36 @@
 import { useEditorStore } from '@/stores/editor'
 import { useSettingStore } from '@/stores/setting'
 import { storeToRefs } from 'pinia'
-import { ImageSource } from '@/enums/enums'
+import { ImageSource, ImageLayout } from '@/enums/enums'
 import Url from '@/components/icons/url.vue'
 import Upload from '@/components/icons/upload.vue'
 import Bucket from '@/components/icons/bucket.vue'
 import Addmore from '@/components/icons/addmore.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseSelect from '@/components/common/BaseSelect.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import TheUppy from '@/components/advanced/TheUppy.vue'
+import { localStg } from '@/utils/storage'
 
 const editorStore = useEditorStore()
-const { imageToAdd, ImageUploading } = storeToRefs(editorStore)
+const { imageToAdd, ImageUploading, echoToAdd } = storeToRefs(editorStore)
 const settingStore = useSettingStore()
 const { S3Setting } = storeToRefs(settingStore)
+
+const handleSetImageSource = (source: ImageSource) => {
+  imageToAdd.value.image_source = source
+
+  // 记忆上传方式
+  localStg.setItem('image_source', source)
+}
+
+// 布局选择
+const layoutOptions = [
+  { label: '瀑布流', value: ImageLayout.WATERFALL },
+  { label: '九宫格', value: ImageLayout.GRID },
+  { label: '单图轮播', value: ImageLayout.CAROUSEL },
+  { label: '水平轮播', value: ImageLayout.HORIZONTAL },
+]
 </script>
 
 <style scoped></style>

@@ -93,6 +93,7 @@ func InitDatabase() {
 		SetDB(SQLiteDB)
 	}
 
+	// 自动建表
 	if err := MigrateDB(); err != nil {
 		util.HandlePanicError(&commonModel.ServerError{
 			Msg: commonModel.MIGRATE_DB_PANIC,
@@ -100,8 +101,13 @@ func InitDatabase() {
 		})
 	}
 
-	// 从 1.x 迁移到 2.x
-	// UpdateMigration() // 目前应该不需要了，不再对远古版本提供支持
+	// 执行旧数据库迁移和数据修复任务
+	if err := UpdateMigration(); err != nil {
+		util.HandlePanicError(&commonModel.ServerError{
+			Msg: commonModel.MIGRATE_DB_PANIC,
+			Err: err,
+		})
+	}
 }
 
 // MigrateDB 执行数据库迁移

@@ -30,8 +30,10 @@ import { MdEditor, config } from 'md-editor-v3'
 import type { ToolbarNames } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { useEditorStore } from '@/stores/editor'
+import { useThemeStore } from '@/stores/theme'
 
 const editorStore = useEditorStore()
+const themeStore = useThemeStore()
 
 const content = computed<string>({
   get: () => editorStore.echoToAdd.content,
@@ -40,9 +42,11 @@ const content = computed<string>({
   },
 })
 
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
+
 const initEditor = reactive({
   class: 'theMdEditor',
-  theme: 'light' as 'light' | 'dark',
+  theme: theme,
   language: 'my-lang',
   id: 'theMdEditor',
   showCodeRowNumber: false,

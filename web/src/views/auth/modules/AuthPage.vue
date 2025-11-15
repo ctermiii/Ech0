@@ -44,11 +44,13 @@
             <BaseButton
               v-if="oauth2Status && oauth2Status.enabled"
               :icon="
-                oauth2Status.provider === 'github'
+                oauth2Status.provider === OAuth2Provider.GITHUB
                   ? Github
-                  : oauth2Status.provider === 'google'
+                  : oauth2Status.provider === OAuth2Provider.GOOGLE
                     ? Google
-                    : Customoauth
+                    : oauth2Status.provider === OAuth2Provider.QQ
+                      ? QQ
+                      : Customoauth
               "
               @click="gotoOAuth2URL"
               class="w-9 h-9 rounded-md mr-2"
@@ -114,8 +116,10 @@ import Arrow from '@/components/icons/arrow.vue'
 import Home from '@/components/icons/home.vue'
 import Github from '@/components/icons/github.vue'
 import Google from '@/components/icons/google.vue'
+import QQ from '@/components/icons/qq.vue'
 import Customoauth from '@/components/icons/customoauth.vue'
 import { fetchGetOAuth2Status } from '@/service/api'
+import { OAuth2Provider } from '@/enums/enums'
 
 const AuthMode = ref<'login' | 'register'>('login') // login / register
 const username = ref<string>('')

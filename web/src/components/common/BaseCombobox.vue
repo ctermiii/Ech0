@@ -16,7 +16,7 @@
       <div class="relative">
         <!-- Input -->
         <div
-          class="flex items-center px-0.5 py-0.5 rounded-md bg-white transition duration-150 ease-in-out"
+          class="flex items-center px-0.5 py-0.5 rounded-md bg-[var(--input-bg-color)] transition duration-150 ease-in-out"
           @focusout="onBlurOutside"
           @focusin="onFocusInput"
           @mousedown="onFocusInput"

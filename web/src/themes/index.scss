@@ -1,6 +1,6 @@
 // File: src/themes/index.scss
-@import './light.scss';
-@import './dark.scss';
+@use './light.scss';
+@use './dark.scss';
 
 // widget
 .widget {

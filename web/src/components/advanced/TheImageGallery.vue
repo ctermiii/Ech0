@@ -213,16 +213,6 @@ onBeforeUnmount(() => {})
     transform 0.3s ease,
     box-shadow 0.3s ease;
 }
-
-button:hover .echoimg {
-  transform: scale(1.02);
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    0 4px 8px rgba(0, 0, 0, 0.04),
-    0 8px 16px rgba(0, 0, 0, 0.04),
-    0 16px 32px rgba(0, 0, 0, 0.04);
-}
-
 /* carousel, horizontal, grid styles (copied/adapted from provided template) */
 .carousel-container {
   position: relative;

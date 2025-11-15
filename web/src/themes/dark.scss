@@ -1,14 +1,14 @@
 :root.dark {
-  --main-color: #1a1a1a;
+  --main-color: #333333;
 
   --selection-text-color: #413a1f;
   --selection-bg-color: #fdfdfd;
 
   // 主体
-  --bg-color: #1a1a1a;
+  --bg-color: #333333;
   --text-color: #f4f4f4;
 
-  --ring-color: oklch(0.23 0 0);
+  --ring-color: oklch(0.32 0 0);
 
   // 通用卡片
   --card-color: #262626;
@@ -18,9 +18,10 @@
   --editor-bg-color: #262626;
   --editor-text-color: oklch(0.98 0 0);
   --editor-title-color: oklch(0.9 0.01 136.32);
+  --tag-editor-border-color: oklch(0.33 0 0);
 
   // 小组件
-  --widget-bg-color: #262626;
+  --widget-bg-color: #212121;
   --widget-title-color: oklch(0.97 0 0);
   --widget-text-color: oklch(0.97 0.01 136.32);
 
@@ -38,4 +39,5 @@
   // 通用组件
   --btn-bg-color: oklch(23.129% 0.0063 214.626);
   --btn-ring-color: oklch(0.23 0 0);
+  --input-bg-color: #262626;
 }

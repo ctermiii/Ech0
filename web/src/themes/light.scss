@@ -16,6 +16,7 @@
   --editor-bg-color: #ffffff;
   --editor-text-color: oklch(0.98 0 0);
   --editor-title-color: oklch(44.6% 0.043 257.281);
+  --tag-editor-border-color: oklch(87.2% 0.01 258.338);
 
   --widget-bg-color: #ffffff;
   --widget-title-color: oklch(44.6% 0.03 256.802);
@@ -35,4 +36,6 @@
   // 通用组件
   --btn-bg-color: oklch(98.5% 0.002 247.839);
   --btn-ring-color: oklch(87.2% 0.01 258.338);
+  --input-bg-color: #ffffff;
+  --input-border-color: #373737;
 }

@@ -31,7 +31,7 @@
       <!-- Tag Add or Select -->
       <div v-if="currentMode === Mode.ECH0">
         <div
-          class="flex items-center justify-between rounded-sm border border-gray-300 border-dashed px-1"
+          class="flex items-center justify-between rounded-sm border border-[var(--tag-editor-border-color)] border-dashed px-1"
         >
           <span class="text-gray-300">#</span>
           <BaseCombobox

@@ -17,7 +17,7 @@
     <div class="flex flex-row items-center gap-2">
       <!-- Hello -->
       <div
-        class="p-1 ring-1 ring-inset ring-gray-200 rounded-full transition-colors duration-200 cursor-pointer"
+        class="p-1 ring-1 ring-inset ring-[var(--ring-color)] rounded-full transition-colors duration-200 cursor-pointer"
       >
         <Hello @click="handleHello" class="w-6 h-6" />
       </div>

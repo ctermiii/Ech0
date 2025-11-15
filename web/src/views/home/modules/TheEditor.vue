@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="ShowEditor"
-    class="bg-white rounded-lg ring-1 ring-gray-200 ring-inset mx-auto shadow-xs hover:shadow-sm"
+    class="bg-[var(--editor-bg-color)] ring-1 ring-[var(--ring-color)] ring-inset rounded-lg mx-auto shadow-xs hover:shadow-sm"
   >
     <div class="mx-auto w-full px-3 py-4">
       <!-- The Title && Nav -->

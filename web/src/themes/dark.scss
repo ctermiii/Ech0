@@ -1,7 +1,14 @@
 :root.dark {
+  --main-color: #1a1a1a;
+
+  --selection-text-color: #413a1f;
+  --selection-bg-color: #fdfdfd;
+
   // 主体
   --bg-color: #1a1a1a;
   --text-color: #f4f4f4;
+
+  --ring-color: oklch(0.23 0 0);
 
   // 通用卡片
   --card-color: #262626;
@@ -18,14 +25,17 @@
   --widget-text-color: oklch(0.97 0.01 136.32);
 
   // 时间轴
-  --timeline-line-color: oklch(0.3 0 0);
-  --timeline-dot-color: oklch(0.6 0.02 216.48);
-  --timeline-datetime-color: oklch(0.7 0.01 136.32);
+  --timeline-line-color: oklch(0.56 0 0);
+  --timeline-dot-color: oklch(64.6% 0.222 41.116);
+  --timeline-datetime-color: oklch(70.5% 0.213 47.604);
   --timeline-tag-color: oklch(0.8 0.02 216.48);
 
   // Echo
+  --echo-card-btn-bg-color: #262626;
+  --echo-detail-bg-color: #262626;
   --echo-text-color: oklch(0.9 0.01 136.32);
 
   // 通用组件
-  --btn-bg-color: oklch(0.3 0.02 216.48);
+  --btn-bg-color: oklch(23.129% 0.0063 214.626);
+  --btn-ring-color: oklch(0.23 0 0);
 }

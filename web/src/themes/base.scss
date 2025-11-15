@@ -1,0 +1,25 @@
+:root {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+html,
+body {
+  /* font-family: 'LXGW WenKai Screen'; */
+  font-family: var(--font-sans);
+  scrollbar-width: thin;
+  scrollbar-arrow-color: transparent;
+  scrollbar-base-color: transparent;
+  scrollbar-color: transparent transparent;
+
+  background-color: var(--bg-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+::selection {
+  color: var(--selection-text-color);
+  background-color: var(--selection-bg-color);
+}

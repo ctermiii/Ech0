@@ -6,8 +6,9 @@ type ThemeType = 'light' | 'dark';
 
 export const useThemeStore = defineStore('themeStore', () => {
   const savedTheme = localStg.getItem('theme');
+  const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const theme = ref<ThemeType>(
-    savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light'
+    savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : (systemPrefersDark ? 'dark' : 'light')
   );
 
   const toggleTheme = () => {

@@ -38,7 +38,7 @@
             <MdPreview
               :id="previewOptions.proviewId"
               :modelValue="props.echo.content"
-              :theme="previewOptions.theme"
+              :theme="theme"
               :show-code-row-number="previewOptions.showCodeRowNumber"
               :preview-theme="previewOptions.previewTheme"
               :code-theme="previewOptions.codeTheme"
@@ -68,7 +68,7 @@
             <MdPreview
               :id="previewOptions.proviewId"
               :modelValue="props.echo.content"
-              :theme="previewOptions.theme"
+              :theme="theme"
               :show-code-row-number="previewOptions.showCodeRowNumber"
               :preview-theme="previewOptions.previewTheme"
               :code-theme="previewOptions.codeTheme"
@@ -154,18 +154,21 @@ import TheWebsiteCard from './TheWebsiteCard.vue'
 import TheImageGallery from './TheImageGallery.vue'
 import 'md-editor-v3/lib/preview.css'
 import { MdPreview } from 'md-editor-v3'
-import { onMounted, ref } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
+import { useThemeStore } from '@/stores/theme'
 
 type Echo = App.Api.Hub.Echo
 
 const props = defineProps<{
   echo: Echo
 }>()
+const themeStore = useThemeStore()
+
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
 const previewOptions = {
   proviewId: 'preview-only',
-  theme: 'light' as 'light' | 'dark',
   showCodeRowNumber: false,
   previewTheme: 'github',
   codeTheme: 'atom',

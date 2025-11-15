@@ -1,8 +1,10 @@
 <template>
   <div v-if="PlayingMusicURL" class="px-9 md:px-11">
     <!-- 列出所有连接（列出每个连接的头像） -->
-    <div class="rounded-md shadow-sm hover:shadow-md ring-1 ring-gray-200 ring-inset bg-white p-4">
-      <p class="text-gray-600 font-bold text-lg flex items-center">
+    <div
+      class="widget rounded-md shadow-sm hover:shadow-md ring-1 ring-[var(--ring-color)] ring-inset p-4"
+    >
+      <p class="text-[var(--widget-title-color)] font-bold text-lg flex items-center">
         <Album class="mr-1" /> 最近在听：
       </p>
       <div class="flex items-center gap-4 my-1">

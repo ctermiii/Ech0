@@ -1,6 +1,12 @@
 // File: src/themes/index.scss
 @use './light.scss';
 @use './dark.scss';
+@use './base.scss';
+
+// Editor && Preview
+.md-editor div.github-theme {
+  color: var(--text-color) !important;
+}
 
 // widget
 .widget {

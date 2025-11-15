@@ -1,8 +1,8 @@
 <template>
   <button
     :class="[
-      'cursor-pointer p-1.5 shadow-xs ring-inset ring-1 ring-gray-300 text-gray-700 outline-none',
-      hasBg ? '' : 'bg-gray-50',
+      'cursor-pointer p-1.5 shadow-xs ring-inset ring-1 ring-[var(--btn-ring-color)] text-gray-700 outline-none',
+      hasBg ? '' : 'bg-[var(--btn-bg-color)]',
       props.class,
       disabled ? 'cursor-not-allowed opacity-70' : '',
     ]"

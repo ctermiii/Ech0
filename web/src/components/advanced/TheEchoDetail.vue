@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full max-w-sm bg-white h-auto p-5 shadow rounded-lg mx-auto">
+  <div
+    class="w-full max-w-sm bg-[var(--echo-detail-bg-color)] h-auto p-5 shadow rounded-lg mx-auto"
+  >
     <!-- 顶部Logo 和 用户名 -->
     <div class="flex flex-row items-center gap-2 mt-2 mb-4">
       <!-- <div class="text-xl">👾</div> -->
@@ -39,7 +41,7 @@
             <MdPreview
               :id="previewOptions.proviewId"
               :modelValue="props.echo.content"
-              :theme="previewOptions.theme"
+              :theme="theme"
               :show-code-row-number="previewOptions.showCodeRowNumber"
               :preview-theme="previewOptions.previewTheme"
               :code-theme="previewOptions.codeTheme"
@@ -61,7 +63,7 @@
             <MdPreview
               :id="previewOptions.proviewId"
               :modelValue="props.echo.content"
-              :theme="previewOptions.theme"
+              :theme="theme"
               :show-code-row-number="previewOptions.showCodeRowNumber"
               :preview-theme="previewOptions.previewTheme"
               :code-theme="previewOptions.codeTheme"
@@ -162,7 +164,7 @@ import TheWebsiteCard from './TheWebsiteCard.vue'
 import TheImageGallery from './TheImageGallery.vue'
 import 'md-editor-v3/lib/preview.css'
 import { MdPreview } from 'md-editor-v3'
-import { onMounted, ref } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { fetchLikeEcho } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { localStg } from '@/utils/storage'
@@ -172,6 +174,7 @@ import { useSettingStore } from '@/stores/setting'
 import { getApiUrl } from '@/service/request/shared'
 import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
+import { useThemeStore } from '@/stores/theme'
 
 const emit = defineEmits(['updateLikeCount'])
 
@@ -180,9 +183,11 @@ type Echo = App.Api.Ech0.Echo
 const props = defineProps<{
   echo: Echo
 }>()
+const themeStore = useThemeStore()
+
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
 const previewOptions = {
   proviewId: 'preview-only',
-  theme: 'light' as 'light' | 'dark',
   showCodeRowNumber: false,
   previewTheme: 'github',
   codeTheme: 'atom',

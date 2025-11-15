@@ -1,11 +1,38 @@
 :root.light {
+  --main-color: #f4f1ec;
+
+  --selection-text-color: #fffcf0;
+  --selection-bg-color: #393022;
+
   --bg-color: #f4f1ec;
   --text-color: #1a1a1a;
+
+  --ring-color: oklch(92.8% 0.006 264.531);
 
   --card-color: #ffffff;
   --card-text-color: oklch(70.7% 0.022 261.325);
 
+  // 编辑器
+  --editor-bg-color: #ffffff;
+  --editor-text-color: oklch(0.98 0 0);
+  --editor-title-color: oklch(44.6% 0.043 257.281);
+
   --widget-bg-color: #ffffff;
   --widget-title-color: oklch(44.6% 0.03 256.802);
   --widget-text-color: oklch(55.3% 0.013 58.071);
+
+  // 时间轴
+  --timeline-line-color: #0000000d;
+  --timeline-dot-color: oklch(64.6% 0.222 41.116);
+  --timeline-datetime-color: oklch(70.5% 0.213 47.604);
+  --timeline-tag-color: oklch(87.2% 0.01 258.338);
+
+  // Echo
+  --echo-card-btn-bg-color: #ffffff;
+  --echo-detail-bg-color: #ffffff;
+  --echo-text-color: oklch(0.9 0.01 136.32);
+
+  // 通用组件
+  --btn-bg-color: oklch(98.5% 0.002 247.839);
+  --btn-ring-color: oklch(87.2% 0.01 258.338);
 }

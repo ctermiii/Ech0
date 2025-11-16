@@ -16,7 +16,7 @@
         :disabled="disabled"
         :readonly="readonly"
         :class="[
-          'block px-3 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out shadow-xs sm:text-sm text-gray-600',
+          'block px-3 py-2 rounded-lg border border-[var(--input-border-color)] focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 transition duration-150 ease-in-out shadow-xs sm:text-sm text-[var(--placeholder-color)] bg-[var(--input-bg-color)] w-full',
           disabled
             ? 'cursor-not-allowed opacity-70 text-gray-400'
             : 'hover:border-orange-400 focus:text-gray-700',

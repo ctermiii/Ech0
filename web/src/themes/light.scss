@@ -33,6 +33,14 @@
   --echo-detail-bg-color: #ffffff;
   --echo-text-color: oklch(0.9 0.01 136.32);
 
+  // Heatmap
+  --heatmap-ring-color: oklch(96.7% 0.003 264.542);
+  --heatmap-bg-color-0: #ffffff;
+  --heatmap-bg-color-1: #c6e48b;
+  --heatmap-bg-color-2: #7bc96f;
+  --heatmap-bg-color-3: #239a3b;
+  --heatmap-bg-color-4: #196127;
+
   // 通用组件
   --btn-bg-color: oklch(98.5% 0.002 247.839);
   --btn-ring-color: oklch(87.2% 0.01 258.338);

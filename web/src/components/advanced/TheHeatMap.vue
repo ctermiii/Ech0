@@ -6,7 +6,7 @@
           <div
             v-for="row in 3"
             :key="row"
-            class="relative w-5 h-5 rounded-[6px] transition-colors duration-300 ease ring-1 ring-gray-100 hover:ring-gray-300 hover:shadow-sm"
+            class="relative w-5 h-5 rounded-[6px] transition-colors duration-300 ease ring-1 ring-[var(--heatmap-ring-color)] hover:ring-gray-300 hover:shadow-sm"
             :style="{ backgroundColor: getColor(getCell(row - 1, col - 1)?.count ?? 0) }"
             @mouseenter="showTooltip(row - 1, col - 1, $event)"
             @mouseleave="hideTooltip"
@@ -51,11 +51,11 @@ const getCell = (row: number, col: number) => {
 }
 
 const getColor = (count: number): string => {
-  if (count >= 4) return '#196127'
-  if (count >= 3) return '#239a3b'
-  if (count >= 2) return '#7bc96f'
-  if (count >= 1) return '#c6e48b'
-  return '#fff'
+  if (count >= 4) return 'var(--heatmap-bg-color-4)'
+  if (count >= 3) return 'var(--heatmap-bg-color-3)'
+  if (count >= 2) return 'var(--heatmap-bg-color-2)'
+  if (count >= 1) return 'var(--heatmap-bg-color-1)'
+  return 'var(--heatmap-bg-color-0)'
 }
 
 // Tooltip 相关

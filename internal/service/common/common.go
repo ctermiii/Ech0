@@ -328,30 +328,25 @@ func (commonService *CommonService) GenerateRSS(ctx *gin.Context) (string, error
 
 		// 添加图片链接到正文前(scheme://host/api/ImageURL)
 		if len(msg.Images) > 0 {
+			var imageContent []byte
 			for _, image := range msg.Images {
 				// 根据图片来源生成链接
+				var imageURL string
 				switch image.ImageSource {
 				case echoModel.ImageSourceLocal:
-					imageURL := fmt.Sprintf("%s://%s/api%s", schema, host, image.ImageURL)
-					renderedContent = append(
-						[]byte(
-							fmt.Sprintf(
-								"<img src=\"%s\" alt=\"Image\" style=\"max-width:100%%;height:auto;\" />",
-								imageURL,
-							),
-						),
-						renderedContent...)
+					imageURL = fmt.Sprintf("%s://%s/api%s", schema, host, image.ImageURL)
 				case echoModel.ImageSourceS3:
-					imageURL := image.ImageURL
-					renderedContent = append(
-						[]byte(
-							fmt.Sprintf(
-								"<img src=\"%s\" alt=\"Image\" style=\"max-width:100%%;height:auto;\" />",
-								imageURL,
-							),
-						),
-						renderedContent...)
+					imageURL = image.ImageURL
 				}
+				imageContent = fmt.Appendf(imageContent, "<img src=\"%s\" alt=\"Image\" style=\"max-width:100%%;height:auto;\" />", imageURL)
+			}
+			renderedContent = append(imageContent, renderedContent...)
+		}
+
+		// 添加标签到正文后
+		if len(msg.Tags) > 0 {
+			for _, tag := range msg.Tags {
+				renderedContent = fmt.Appendf(renderedContent, "<br /><span class=\"tag\">#%s</span>", tag.Name)
 			}
 		}
 

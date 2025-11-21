@@ -64,9 +64,9 @@ func NewMinioStorage(
 	}
 
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
-		Secure: secure,
-		Region: region,
+		Creds:              credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure:             secure,
+		Region:             region,
 		BucketLookupViaURL: CustomBucketLookupViaURL,
 	})
 	if err != nil {

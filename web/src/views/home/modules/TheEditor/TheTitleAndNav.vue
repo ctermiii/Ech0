@@ -9,7 +9,7 @@
           class="w-6 sm:w-7 h-6 sm:h-7 rounded-full ring-1 ring-gray-200 shadow-sm object-cover"
         />
       </div>
-      <h1 class="text-slate-600 font-bold sm:text-xl">
+      <h1 class="text-[var(--editor-title-color)] font-bold sm:text-xl">
         {{ SystemSetting.server_name }}
       </h1>
     </div>
@@ -17,7 +17,7 @@
     <div class="flex flex-row items-center gap-2">
       <!-- Hello -->
       <div
-        class="p-1 ring-1 ring-inset ring-gray-200 rounded-full transition-colors duration-200 cursor-pointer"
+        class="p-1 ring-1 ring-inset ring-[var(--ring-color)] rounded-full transition-colors duration-200 cursor-pointer"
       >
         <Hello @click="handleHello" class="w-6 h-6" />
       </div>
@@ -39,10 +39,12 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { fetchGetStatus, fetchHelloEch0 } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
+import { useThemeStore } from '@/stores/theme'
 import { getApiUrl } from '@/service/request/shared'
 import { theToast } from '@/utils/toast'
 
 const settingStore = useSettingStore()
+const themeStore = useThemeStore()
 
 const { SystemSetting } = storeToRefs(settingStore)
 
@@ -50,6 +52,8 @@ const apiUrl = getApiUrl()
 const logo = ref<string>('/favicon.svg')
 
 const handleHello = () => {
+  themeStore.toggleTheme()
+
   const hello = ref<App.Api.Ech0.HelloEch0>()
 
   fetchHelloEch0().then((res) => {

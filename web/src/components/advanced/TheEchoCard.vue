@@ -5,11 +5,11 @@
       <!-- 日期时间 -->
       <div class="flex justify-start items-center h-auto">
         <!-- 小点 -->
-        <div class="w-2 h-2 rounded-full bg-orange-600 mr-2"></div>
+        <div class="w-2 h-2 rounded-full bg-[var(--timeline-dot-color)] mr-2"></div>
         <!-- 具体日期时间 -->
         <div
           @click="handleExpandEcho(echo.id)"
-          class="flex justify-start text-sm text-nowrap text-orange-500 hover:underline hover:decoration-offset-3 hover:decoration-1 mr-1"
+          class="flex justify-start text-sm text-nowrap text-[var(--timeline-datetime-color)] hover:underline hover:decoration-offset-3 hover:decoration-1 mr-1"
         >
           {{ formatDate(props.echo.created_at) }}
         </div>
@@ -17,7 +17,7 @@
         <div
           v-if="!showMenu"
           @click="handleFilterByTag"
-          class="text-sm text-gray-300 w-24 px-1 truncate text-nowrap hover:cursor-pointer hover:text-gray-400 hover:underline hover:decoration-offset-3 hover:decoration-1"
+          class="text-sm text-[var(--timeline-tag-color)] w-24 px-1 truncate text-nowrap hover:cursor-pointer hover:text-gray-400 hover:underline hover:decoration-offset-3 hover:decoration-1"
         >
           <span>{{ props.echo.tags ? `#${props.echo.tags[0]?.name}` : '' }}</span>
         </div>
@@ -29,7 +29,7 @@
         <div
           v-if="!showMenu"
           @click.stop="toggleMenu"
-          class="w-7 h-7 flex items-center justify-center bg-white ring-1 ring-gray-200 ring-inset rounded-full shadow-sm hover:shadow-md transition"
+          class="w-7 h-7 flex items-center justify-center bg-[var(--echo-card-btn-bg-color)] ring-1 ring-[var(--ring-color)] ring-inset rounded-full shadow-sm hover:shadow-md transition"
         >
           <!-- 默认图标，展开后隐藏 -->
           <More class="w-5 h-5" />
@@ -38,7 +38,7 @@
         <!-- 展开后的按钮组 -->
         <div
           v-if="showMenu"
-          class="flex items-center gap-4 bg-white rounded-full px-2 py-1 shadow-sm hover:shadow-md ring-1 ring-gray-200 ring-inset"
+          class="flex items-center gap-4 bg-[var(--echo-card-btn-bg-color)] rounded-full px-2 py-1 shadow-sm hover:shadow-md ring-1 ring-[var(--ring-color)] ring-inset"
         >
           <!-- 是否隐私 -->
           <span v-if="props.echo.private" title="私密状态">
@@ -101,25 +101,53 @@
     </div>
 
     <!-- 图片 && 内容 -->
-    <div class="border-l-2 border-[#0000000d] ml-1">
+    <div class="border-l-2 border-[var(--timeline-line-color)] ml-1">
       <div class="px-4 py-3">
-        <TheImageGallery :images="props.echo.images" />
+        <!-- 根据布局决定文字与图片顺序 -->
+        <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
+        <template
+          v-if="
+            props.echo.layout === ImageLayout.GRID || props.echo.layout === ImageLayout.HORIZONTAL
+          "
+        >
+          <!-- 文字在上 -->
+          <div class="mx-auto w-11/12 pl-1 mb-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
 
-        <!-- 内容 -->
-        <div class="mx-auto w-11/12 pl-1">
-          <MdPreview
-            :id="previewOptions.proviewId"
-            :modelValue="props.echo.content"
-            :theme="previewOptions.theme"
-            :show-code-row-number="previewOptions.showCodeRowNumber"
-            :preview-theme="previewOptions.previewTheme"
-            :code-theme="previewOptions.codeTheme"
-            :code-style-reverse="previewOptions.codeStyleReverse"
-            :no-img-zoom-in="previewOptions.noImgZoomIn"
-            :code-foldable="previewOptions.codeFoldable"
-            :auto-fold-threshold="previewOptions.autoFoldThreshold"
-          />
-        </div>
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+        </template>
+
+        <template v-else>
+          <!-- 图片在上，文字在下（瀑布流 / 单图轮播 等） -->
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+
+          <div class="mx-auto w-11/12 pl-1 mt-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
+        </template>
 
         <!-- 扩展内容 -->
         <div v-if="props.echo.extension" class="my-2">
@@ -147,7 +175,7 @@
 
 <script setup lang="ts">
 import { MdPreview } from 'md-editor-v3'
-import { onMounted, ref, onBeforeUnmount } from 'vue'
+import { onMounted, ref, onBeforeUnmount, computed } from 'vue'
 import { fetchDeleteEcho, fetchLikeEcho, fetchGetEchoById } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { useUserStore } from '@/stores/user'
@@ -165,9 +193,10 @@ import TheAPlayerCard from './TheAPlayerCard.vue'
 import TheWebsiteCard from './TheWebsiteCard.vue'
 import { useEchoStore } from '@/stores/echo'
 import { useEditorStore } from '@/stores/editor'
+import { useThemeStore } from '@/stores/theme'
 import { localStg } from '@/utils/storage'
 import { useRouter } from 'vue-router'
-import { ExtensionType } from '@/enums/enums'
+import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
 import { useBaseDialog } from '@/composables/useBaseDialog'
 const { openConfirm } = useBaseDialog()
@@ -183,9 +212,11 @@ const props = defineProps<{
 const isLikeAnimating = ref(false)
 
 const userStore = useUserStore()
+const themeStore = useThemeStore()
+
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
 const previewOptions = {
   proviewId: 'preview-only',
-  theme: 'light' as 'light' | 'dark',
   showCodeRowNumber: false,
   previewTheme: 'github',
   codeTheme: 'atom',

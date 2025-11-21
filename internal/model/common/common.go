@@ -82,6 +82,7 @@ const (
 const (
 	OAuth2GITHUB OAuth2Provider = "github"
 	OAuth2GOOGLE OAuth2Provider = "google"
+	OAuth2QQ     OAuth2Provider = "qq"
 	OAuth2CUSTOM OAuth2Provider = "custom"
 )
 
@@ -124,5 +125,5 @@ const (
 
 const (
 	// Version 是当前版本号
-	Version = "2.9.9"
+	Version = "2.9.10"
 )

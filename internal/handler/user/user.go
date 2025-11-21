@@ -436,6 +436,87 @@ func (userHandler *UserHandler) GoogleCallback() gin.HandlerFunc {
 	})
 }
 
+// QQLogin 处理 QQ OAuth2 登录请求
+func (userHandler *UserHandler) QQLogin() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		// 获取重定向 URL
+		redirect_URI := ctx.Query("redirect_uri")
+
+		redirectURL, err := userHandler.userService.GetOAuthLoginURL(
+			string(commonModel.OAuth2QQ),
+			redirect_URI,
+		)
+		if err != nil {
+			return res.Response{
+				Msg: commonModel.FAILED_TO_GET_QQ_LOGIN_URL,
+				Err: err,
+			}
+		}
+
+		// 重定向到 QQ 登录页面
+		ctx.Redirect(302, redirectURL)
+		return res.Response{}
+	})
+}
+
+// QQCallback 处理 QQ OAuth2 回调
+func (userHandler *UserHandler) QQCallback() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		code := ctx.Query("code")
+		state := ctx.Query("state")
+		if code == "" || state == "" {
+			return res.Response{
+				Msg: commonModel.INVALID_PARAMS,
+				Err: nil,
+			}
+		}
+
+		redirectURL := userHandler.userService.HandleOAuthCallback(
+			string(commonModel.OAuth2QQ),
+			code,
+			state,
+		)
+		ctx.Redirect(302, redirectURL)
+		return res.Response{}
+	})
+}
+
+// BindQQ 绑定 QQ 账号
+func (userHandler *UserHandler) BindQQ() gin.HandlerFunc {
+	return res.Execute(func(ctx *gin.Context) res.Response {
+		// 获取当前用户 ID
+		userid := ctx.MustGet("userid").(uint)
+
+		type Req struct {
+			RedirectURI string `json:"redirect_uri"`
+		}
+		var req Req
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			return res.Response{
+				Msg: commonModel.INVALID_REQUEST_BODY,
+				Err: err,
+			}
+		}
+
+		bindURL, err := userHandler.userService.BindOAuth(
+			userid,
+			string(commonModel.OAuth2QQ),
+			req.RedirectURI,
+		)
+		if err != nil {
+			return res.Response{
+				Msg: "",
+				Err: err,
+			}
+		}
+
+		return res.Response{
+			Data: bindURL,
+			Msg:  commonModel.GET_OAUTH_BINGURL_SUCCESS,
+		}
+	})
+}
+
 // CustomOAuthLogin 处理自定义 OAuth2 登录请求
 func (userHandler *UserHandler) CustomOAuthLogin() gin.HandlerFunc {
 	return res.Execute(func(ctx *gin.Context) res.Response {
@@ -526,7 +607,10 @@ func (userHandler *UserHandler) GetOAuthInfo() gin.HandlerFunc {
 		// 获取 provider 参数
 		provider := ctx.Query("provider")
 		switch provider {
-		case string(commonModel.OAuth2GITHUB), string(commonModel.OAuth2GOOGLE), string(commonModel.OAuth2CUSTOM):
+		case string(commonModel.OAuth2GITHUB),
+			string(commonModel.OAuth2GOOGLE),
+			string(commonModel.OAuth2QQ),
+			string(commonModel.OAuth2CUSTOM):
 			// 保持原值
 		default:
 			provider = string(commonModel.OAuth2GITHUB) // 默认使用 GitHub

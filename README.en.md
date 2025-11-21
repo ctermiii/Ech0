@@ -290,7 +290,7 @@ ssh -p 6278 ssh.vaaat.com
 ## Development Guide
 
 ### Backend Requirements
-- Go 1.25.1+  
+- Go 1.25.3+  
 - C Compiler for CGO (`go-sqlite3`):
   - Windows: [MinGW-w64](https://winlibs.com/)  
   - macOS: `brew install gcc`  
@@ -300,7 +300,7 @@ ssh -p 6278 ssh.vaaat.com
 - Swagger: `swag init -g internal/server/server.go -o internal/swagger`  
 
 ### Frontend Requirements
-- NodeJS v24.5.0+, PNPM v10.17.1+  
+- NodeJS v24.10.0+, PNPM v10.20.1+  
 - Use [fnm](https://github.com/Schniz/fnm) if multiple Node versions needed
 
 ### Start Backend & Frontend
@@ -332,6 +332,8 @@ Thank you to all the friends who have supported this project! Your contributions
 | 🧑‍💻 [@QYG2297248353](https://github.com/QYG2297248353) | 2025-10-10 | None                                            |
 |    🧑‍💻 [@continue33](https://github.com/continue33)    | 2025-10-23 | Thanks for fixing R2                            |
 |                  🧑‍💻 Anonymous Friend                  | 2025-10-28 | hoochanlon              |
+|       🧑‍💻 [@Rvn0xsy](https://github.com/Rvn0xsy)       | 2025-11-12 | Great project, I will keep following! |
+|                     🧑‍💻 王贼臣                     | 2025-11-20 | Thanks www.cardopt.cn             |
 
 ---
 

@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/lin-snow/ech0/internal/event"
@@ -470,7 +471,7 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 
 	switch provider {
 	case string(commonModel.OAuth2GITHUB):
-		tokenResp, err := exchangeCodeForToken(setting, code)
+		tokenResp, err := exchangeGithubCodeForToken(setting, code)
 		if err != nil {
 			fmt.Printf("Error exchanging %s code for token: %v\n", provider, err)
 			return ""
@@ -498,6 +499,21 @@ func (userService *UserService) HandleOAuthCallback(provider string, code string
 		}
 
 		return userService.resolveOAuthCallback(oauthState, provider, googleUser.Sub)
+
+	case string(commonModel.OAuth2QQ):
+		tokenResp, err := exchangeQQCodeForToken(setting, code)
+		if err != nil {
+			fmt.Printf("Error exchanging %s code for token: %v\n", provider, err)
+			return ""
+		}
+
+		qqOpenIDResp, err := fetchQQUserInfo(tokenResp.AccessToken)
+		if err != nil {
+			fmt.Printf("Error fetching %s user info: %v\n", provider, err)
+			return ""
+		}
+
+		return userService.resolveOAuthCallback(oauthState, provider, qqOpenIDResp.OpenID)
 
 	case string(commonModel.OAuth2CUSTOM):
 		accessToken, err := exchangeCustomCodeForToken(setting, code)
@@ -573,6 +589,19 @@ func (userService *UserService) buildOAuthAuthorizeURL(
 		}
 
 		return fmt.Sprintf("%s?%s", setting.AuthURL, params.Encode())
+
+	case string(commonModel.OAuth2QQ):
+		params := url.Values{}
+		params.Set("response_type", "code")
+		params.Set("client_id", setting.ClientID)
+		params.Set("redirect_uri", setting.RedirectURI)
+		params.Set("state", state)
+		params.Set("display", "pc")
+		if scope != "" {
+			params.Set("scope", scope)
+		}
+		return fmt.Sprintf("%s?%s", setting.AuthURL, params.Encode())
+
 	case string(commonModel.OAuth2CUSTOM):
 		params := url.Values{}
 		params.Set("client_id", setting.ClientID)
@@ -595,6 +624,8 @@ func bindingPermissionError(provider string) error {
 		return errors.New(commonModel.NO_PERMISSION_BINDING_GITHUB)
 	case string(commonModel.OAuth2GOOGLE):
 		return errors.New(commonModel.NO_PERMISSION_BINDING_GOOGLE)
+	case string(commonModel.OAuth2QQ):
+		return errors.New(commonModel.NO_PERMISSION_BINDING_QQ)
 	case string(commonModel.OAuth2CUSTOM):
 		return errors.New(commonModel.NO_PERMISSION_BINDING_CUSTOM)
 	default:
@@ -655,7 +686,10 @@ func (userService *UserService) resolveOAuthCallback(
 }
 
 // 用 code 换取 access_token
-func exchangeCodeForToken(setting *settingModel.OAuth2Setting, code string) (*authModel.GitHubTokenResponse, error) {
+func exchangeGithubCodeForToken(
+	setting *settingModel.OAuth2Setting,
+	code string,
+) (*authModel.GitHubTokenResponse, error) {
 	data := map[string]string{
 		"client_id":     setting.ClientID,
 		"client_secret": setting.ClientSecret,
@@ -764,6 +798,89 @@ func fetchGoogleUserInfo(setting *settingModel.OAuth2Setting, accessToken string
 	}
 
 	return &user, nil
+}
+
+// exchangeQQCodeForToken 用 code 换取 QQ access_token
+func exchangeQQCodeForToken(setting *settingModel.OAuth2Setting, code string) (*authModel.QQTokenResponse, error) {
+	data := url.Values{}
+	data.Set("grant_type", "authorization_code")
+	data.Set("client_id", setting.ClientID)
+	data.Set("client_secret", setting.ClientSecret)
+	data.Set("code", code)
+	data.Set("redirect_uri", setting.RedirectURI)
+	data.Set("fmt", "json")
+	data.Set("need_openid", "1")
+
+	req, _ := http.NewRequest("GET", setting.TokenURL+"?"+data.Encode(), nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Accept", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("QQ token 响应错误: " + string(body))
+	}
+
+	raw := strings.TrimSpace(string(body))
+
+	// 去掉 callback(...) 包裹
+	if strings.HasPrefix(raw, "callback(") && strings.HasSuffix(raw, ");") {
+		raw = strings.TrimPrefix(raw, "callback(")
+		raw = strings.TrimSuffix(raw, ");")
+		raw = strings.TrimSpace(raw)
+	}
+
+	var tokenResp authModel.QQTokenResponse
+
+	// 优先尝试 JSON 解析
+	if err := json.Unmarshal([]byte(raw), &tokenResp); err == nil {
+		if tokenResp.AccessToken != "" {
+			return &tokenResp, nil
+		}
+	}
+
+	// 尝试解析为 query 格式
+	vals, err := url.ParseQuery(raw)
+	if err == nil && vals.Get("access_token") != "" {
+		tokenResp.AccessToken = vals.Get("access_token")
+		tokenResp.RefreshToken = vals.Get("refresh_token")
+		tokenResp.ExpiresIn, _ = strconv.ParseInt(vals.Get("expires_in"), 10, 64)
+		tokenResp.OpenID = vals.Get("openid")
+		return &tokenResp, nil
+	}
+
+	// 如果都失败，返回错误
+	return nil, errors.New("无法解析 QQ token 响应: " + string(body))
+}
+
+// fetchQQUserInfo 获取 QQ 用户信息
+func fetchQQUserInfo(accessToken string) (*authModel.QQOpenIDResponse, error) {
+	// 先获取 openid
+	openIDURL := "https://graph.qq.com/oauth2.0/me" + "?access_token=" + url.QueryEscape(accessToken) + "&fmt=json"
+	req, _ := http.NewRequest("GET", openIDURL, nil)
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("QQ openid 请求失败: " + string(body))
+	}
+
+	var openIDResp authModel.QQOpenIDResponse
+	if err := json.Unmarshal(body, &openIDResp); err != nil {
+		return nil, err
+	}
+
+	return &openIDResp, nil
 }
 
 // exchangeCustomCodeForToken 通用 OAuth2 令牌交换

@@ -27,23 +27,58 @@
     <!-- 图片 && 内容 -->
     <div>
       <div class="py-4">
-        <TheImageGallery :images="props.echo.images" :baseUrl="echo.server_url" />
+        <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
+        <template
+          v-if="
+            props.echo.layout === ImageLayout.GRID || props.echo.layout === ImageLayout.HORIZONTAL
+          "
+        >
+          <!-- 文字在上 -->
+          <div class="mx-auto w-11/12 pl-1 mb-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
 
-        <!-- 内容 -->
-        <div>
-          <MdPreview
-            :id="previewOptions.proviewId"
-            :modelValue="props.echo.content"
-            :theme="previewOptions.theme"
-            :show-code-row-number="previewOptions.showCodeRowNumber"
-            :preview-theme="previewOptions.previewTheme"
-            :code-theme="previewOptions.codeTheme"
-            :code-style-reverse="previewOptions.codeStyleReverse"
-            :no-img-zoom-in="previewOptions.noImgZoomIn"
-            :code-foldable="previewOptions.codeFoldable"
-            :auto-fold-threshold="previewOptions.autoFoldThreshold"
+          <TheImageGallery
+            :images="props.echo.images"
+            :baseUrl="echo.server_url"
+            :layout="props.echo.layout"
           />
-        </div>
+        </template>
+
+        <template v-else>
+          <!-- 图片在上，文字在下（瀑布流 / 单图轮播 等） -->
+          <TheImageGallery
+            :images="props.echo.images"
+            :baseUrl="echo.server_url"
+            :layout="props.echo.layout"
+          />
+
+          <div class="mx-auto w-11/12 pl-1 mt-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
+        </template>
 
         <!-- 扩展内容 -->
         <div v-if="props.echo.extension" class="my-4">
@@ -119,18 +154,21 @@ import TheWebsiteCard from './TheWebsiteCard.vue'
 import TheImageGallery from './TheImageGallery.vue'
 import 'md-editor-v3/lib/preview.css'
 import { MdPreview } from 'md-editor-v3'
-import { onMounted, ref } from 'vue'
-import { ExtensionType } from '@/enums/enums'
+import { onMounted, computed, ref } from 'vue'
+import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
+import { useThemeStore } from '@/stores/theme'
 
 type Echo = App.Api.Hub.Echo
 
 const props = defineProps<{
   echo: Echo
 }>()
+const themeStore = useThemeStore()
+
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
 const previewOptions = {
   proviewId: 'preview-only',
-  theme: 'light' as 'light' | 'dark',
   showCodeRowNumber: false,
   previewTheme: 'github',
   codeTheme: 'atom',

@@ -1,4 +1,5 @@
 import 'virtual:uno.css'
+import '@/themes/index.scss'
 
 import { initStores } from './stores/store-init'
 
@@ -82,10 +83,3 @@ app.use(router)
 app.component('BaseDialog', BaseDialog)
 
 app.mount('#app')
-
-// 移除加载页
-const loader = document.getElementById('app-loader')
-if (loader) {
-  loader.classList.add('fade-out')
-  setTimeout(() => loader.remove(), 400) // 与 transition 时间一致
-}

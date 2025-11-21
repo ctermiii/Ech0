@@ -1,0 +1,54 @@
+:root.dark {
+  --main-color: #333333;
+
+  --selection-text-color: #413a1f;
+  --selection-bg-color: #fdfdfd;
+
+  // 主体
+  --bg-color: #333333;
+  --text-color: #f4f4f4;
+
+  --ring-color: oklch(0.32 0 0);
+
+  // 通用卡片
+  --card-color: #262626;
+  --card-text-color: oklch(0.98 0 0);
+
+  // 编辑器
+  --editor-bg-color: #262626;
+  --editor-text-color: oklch(0.98 0 0);
+  --editor-title-color: oklch(0.9 0.01 136.32);
+  --tag-editor-border-color: oklch(0.33 0 0);
+
+  // 小组件
+  --widget-bg-color: #212121;
+  --widget-title-color: oklch(0.97 0 0);
+  --widget-text-color: oklch(0.97 0.01 136.32);
+
+  // 时间轴
+  --timeline-line-color: oklch(0.94 0.05 56.52);
+  --timeline-dot-color: oklch(0.79 0.07 74.43);
+  --timeline-datetime-color: oklch(0.79 0.06 81.69);
+  --timeline-tag-color: oklch(0.47 0 0);
+
+  // Echo
+  --echo-card-btn-bg-color: #262626;
+  --echo-detail-bg-color: #262626;
+  --echo-text-color: oklch(0.9 0.01 136.32);
+
+  // Heatmap
+  --heatmap-ring-color: oklch(0.35 0 0);
+  --heatmap-bg-color-0: #212121;
+  --heatmap-bg-color-1: #c6e48b;
+  --heatmap-bg-color-2: #7bc96f;
+  --heatmap-bg-color-3: #239a3b;
+  --heatmap-bg-color-4: #196127;
+
+  // 通用组件
+  --btn-bg-color: oklch(0.25 0 0);
+  --btn-ring-color: oklch(0.25 0 0);
+  --input-bg-color: #262626;
+  --input-border-color: #373737;
+  --textarea-bg-color: #262626;
+  --placeholder-color: oklch(0.7 0 0);
+}

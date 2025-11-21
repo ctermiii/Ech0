@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full max-w-sm bg-white h-auto p-5 shadow rounded-lg mx-auto">
+  <div
+    class="w-full max-w-sm bg-[var(--echo-detail-bg-color)] h-auto p-5 shadow rounded-lg mx-auto"
+  >
     <!-- 顶部Logo 和 用户名 -->
     <div class="flex flex-row items-center gap-2 mt-2 mb-4">
       <!-- <div class="text-xl">👾</div> -->
@@ -27,23 +29,51 @@
     <!-- 图片 && 内容 -->
     <div>
       <div class="py-4">
-        <TheImageGallery :images="props.echo.images" />
+        <!-- 根据布局决定文字与图片顺序 -->
+        <!-- grid 和 horizontal 时，文字在图片上；其他布局（waterfall/carousel/null/undefined）文字在图片下 -->
+        <template
+          v-if="
+            props.echo.layout === ImageLayout.GRID || props.echo.layout === ImageLayout.HORIZONTAL
+          "
+        >
+          <!-- 文字在上 -->
+          <div class="mb-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
 
-        <!-- 内容 -->
-        <div>
-          <MdPreview
-            :id="previewOptions.proviewId"
-            :modelValue="props.echo.content"
-            :theme="previewOptions.theme"
-            :show-code-row-number="previewOptions.showCodeRowNumber"
-            :preview-theme="previewOptions.previewTheme"
-            :code-theme="previewOptions.codeTheme"
-            :code-style-reverse="previewOptions.codeStyleReverse"
-            :no-img-zoom-in="previewOptions.noImgZoomIn"
-            :code-foldable="previewOptions.codeFoldable"
-            :auto-fold-threshold="previewOptions.autoFoldThreshold"
-          />
-        </div>
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+        </template>
+
+        <template v-else>
+          <!-- 图片在上，文字在下 -->
+          <TheImageGallery :images="props.echo.images" :layout="props.echo.layout" />
+
+          <div class="mt-3">
+            <MdPreview
+              :id="previewOptions.proviewId"
+              :modelValue="props.echo.content"
+              :theme="theme"
+              :show-code-row-number="previewOptions.showCodeRowNumber"
+              :preview-theme="previewOptions.previewTheme"
+              :code-theme="previewOptions.codeTheme"
+              :code-style-reverse="previewOptions.codeStyleReverse"
+              :no-img-zoom-in="previewOptions.noImgZoomIn"
+              :code-foldable="previewOptions.codeFoldable"
+              :auto-fold-threshold="previewOptions.autoFoldThreshold"
+            />
+          </div>
+        </template>
 
         <!-- 扩展内容 -->
         <div v-if="props.echo.extension" class="my-4">
@@ -134,7 +164,7 @@ import TheWebsiteCard from './TheWebsiteCard.vue'
 import TheImageGallery from './TheImageGallery.vue'
 import 'md-editor-v3/lib/preview.css'
 import { MdPreview } from 'md-editor-v3'
-import { onMounted, ref } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { fetchLikeEcho } from '@/service/api'
 import { theToast } from '@/utils/toast'
 import { localStg } from '@/utils/storage'
@@ -142,8 +172,9 @@ import { storeToRefs } from 'pinia'
 import { fetchGetStatus } from '@/service/api'
 import { useSettingStore } from '@/stores/setting'
 import { getApiUrl } from '@/service/request/shared'
-import { ExtensionType } from '@/enums/enums'
+import { ExtensionType, ImageLayout } from '@/enums/enums'
 import { formatDate } from '@/utils/other'
+import { useThemeStore } from '@/stores/theme'
 
 const emit = defineEmits(['updateLikeCount'])
 
@@ -152,9 +183,11 @@ type Echo = App.Api.Ech0.Echo
 const props = defineProps<{
   echo: Echo
 }>()
+const themeStore = useThemeStore()
+
+const theme = computed(() => (themeStore.theme === 'light' ? 'light' : 'dark'))
 const previewOptions = {
   proviewId: 'preview-only',
-  theme: 'light' as 'light' | 'dark',
   showCodeRowNumber: false,
   previewTheme: 'github',
   codeTheme: 'atom',
